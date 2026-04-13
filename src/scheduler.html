@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book a Meeting</title>
+  <style>
+    /* ── FIOE Design System ─────────────────────────────────── */
+    :root {
+      --azure-dragon:  #073679;   /* primary brand */
+      --robins-egg:    #6deaf9;   /* accent */
+      --cool-blue:     #4c82b8;   /* hover / secondary */
+      --desired-dawn:  #d8d8d8;   /* light bg tint */
+      --black-beauty:  #222529;   /* body text */
+      --argent:        #87888a;   /* muted / labels */
+      --white:         #ffffff;
+      --bg-body:       #f0f4f8;
+      --border:        #dde3ea;
+      --radius:        10px;
+      --shadow:        0 4px 24px rgba(7,54,121,0.10);
+      --shadow-sm:     0 1px 6px  rgba(7,54,121,0.07);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-body);
+      color: var(--black-beauty);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Top banner ─────────────────────────────────────────── */
+    .top-banner {
+      width: 100%;
+      background: var(--black-beauty);
+      color: var(--white);
+      text-align: center;
+      padding: 28px 16px 24px;
+    }
+    .top-banner .brand {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--robins-egg);
+      margin-bottom: 8px;
+    }
+    .top-banner h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .top-banner p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.80);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.55;
+    }
+
+    /* ── Main content wrapper ───────────────────────────────── */
+    .page-body {
+      width: 100%;
+      max-width: 620px;
+      padding: 32px 16px 60px;
+    }
+
+    /* ── Card ───────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-section {
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-section:last-child { border-bottom: none; }
+
+    /* ── Section headings ───────────────────────────────────── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--argent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+
+    /* ── Loading / empty / error ────────────────────────────── */
+    .state-msg {
+      text-align: center;
+      padding: 32px 0;
+      color: var(--argent);
+      font-size: 14px;
+    }
+    .state-msg.error { color: #c0392b; }
+
+    /* ── Date group header ──────────────────────────────────── */
+    .date-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--azure-dragon);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 14px 0 6px;
+    }
+    .date-header:first-child { margin-top: 0; }
+
+    /* ── Slot grid ──────────────────────────────────────────── */
+    .slots-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .slot-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      background: var(--white);
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--black-beauty);
+      font-weight: 500;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .slot-pill:hover {
+      border-color: var(--cool-blue);
+      background: #eef4fb;
+      color: var(--cool-blue);
+    }
+    .slot-pill.selected {
+      border-color: var(--azure-dragon);
+      background: var(--azure-dragon);
+      color: var(--white);
+      font-weight: 600;
+    }
+    .slot-pill .pill-dur {
+      font-size: 11px;
+      opacity: 0.75;
+    }
+
+    /* ── Form ───────────────────────────────────────────────── */
+    .form-group { margin-bottom: 14px; }
+    .form-group:last-of-type { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--argent);
+      margin-bottom: 5px;
+    }
+    label .req { color: #c0392b; margin-left: 2px; }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      font-size: 14px;
+      color: var(--black-beauty);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus {
+      border-color: var(--cool-blue);
+      box-shadow: 0 0 0 3px rgba(76,130,184,0.12);
+    }
+    textarea { resize: vertical; min-height: 72px; }
+
+    /* ── Primary button ─────────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px 0;
+      background: var(--azure-dragon);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      margin-top: 18px;
+      letter-spacing: 0.01em;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--cool-blue); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* ── Book error ─────────────────────────────────────────── */
+    .book-error-msg {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: #fdf2f2;
+      border: 1px solid #f5c6cb;
+      border-radius: 6px;
+      color: #c0392b;
+      font-size: 13px;
+    }
+
+    /* ── Confirmation ───────────────────────────────────────── */
+    #confirmation { display: none; }
+
+    .confirm-hero {
+      text-align: center;
+      padding: 32px 28px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .confirm-hero .check-circle {
+      width: 64px; height: 64px;
+      background: #e8f5e9;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    .confirm-hero h2 {
+      font-size: 22px;
+      color: var(--azure-dragon);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .confirm-hero p {
+      color: var(--argent);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+    .confirm-hero p strong {
+      color: var(--black-beauty);
+      font-weight: 600;
+    }
+
+    .meet-link-section {
+      display: none;
+      padding: 20px 28px;
+    }
+    .meet-link-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: #eef4fb;
+      border: 1.5px solid var(--cool-blue);
+      border-radius: 8px;
+    }
+    .meet-link-box .meet-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .meet-link-box .meet-details {
+      flex: 1;
+      min-width: 0;
+    }
+    .meet-link-box .meet-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--argent);
+      margin-bottom: 3px;
+    }
+    .meet-link-box a {
+      color: var(--azure-dragon);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .meet-link-box a:hover { text-decoration: underline; }
+
+    /* ── Helpers ────────────────────────────────────────────── */
+    .confirm-hero .confirm-sub { margin-top: 6px; }
+    label .field-optional { font-weight: 400; color: var(--argent); }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .top-banner h1 { font-size: 20px; }
+      .card-section { padding: 20px 18px; }
+      .confirm-hero { padding: 24px 18px 20px; }
+      .meet-link-section { padding: 16px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Top banner ──────────────────────────────────────── -->
+<div class="top-banner">
+  <div class="brand">FIOE &mdash; Scheduling</div>
+  <h1>📅 Book a Meeting</h1>
+  <p>Select an available time slot, fill in your details, and we'll send you a calendar invite with a Google Meet link.</p>
+</div>
+
+<div class="page-body">
+
+  <!-- ── Loading / error states (outside card, shown before load) ── -->
+  <div id="loading-msg" class="state-msg">⏳ Loading available times…</div>
+  <div id="error-msg"   class="state-msg error" style="display:none;"></div>
+  <div id="empty-msg"   class="state-msg" style="display:none;">No available slots right now. Please check back later.</div>
+
+  <!-- ── Main booking card ──────────────────────────────── -->
+  <div class="card" id="main-card" style="display:none;">
+
+    <!-- Slot picker -->
+    <div id="slot-picker">
+      <div class="card-section">
+        <div class="section-label">Choose a time</div>
+        <div id="slots-container"></div>
+      </div>
+
+      <div class="card-section">
+        <div class="section-label">Your details</div>
+        <div class="form-group">
+          <label for="invitee-name">Full Name</label>
+          <input type="text" id="invitee-name" placeholder="Jane Smith" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="invitee-email">Email Address <span class="req">*</span></label>
+          <input type="email" id="invitee-email" placeholder="jane@example.com" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label for="invitee-notes">Notes <span class="field-optional">(optional)</span></label>
+          <textarea id="invitee-notes" placeholder="Anything you'd like us to know before the meeting…"></textarea>
+        </div>
+        <button class="btn-primary" id="book-btn" onclick="bookSlot()">
+          <span>✔</span> Confirm Booking
+        </button>
+        <div id="book-error" class="book-error-msg"></div>
+      </div>
+    </div>
+
+    <!-- Confirmation (replaces picker) -->
+    <div id="confirmation">
+      <div class="confirm-hero">
+        <div class="check-circle">✅</div>
+        <h2>You're all set!</h2>
+        <p id="confirm-detail"></p>
+        <p class="confirm-sub">A calendar invitation has been sent to your email address.</p>
+      </div>
+      <div id="meet-link-section" class="meet-link-section">
+        <div class="meet-link-box">
+          <div class="meet-icon">🎥</div>
+          <div class="meet-details">
+            <div class="meet-label">Google Meet Link</div>
+            <a id="meet-link-anchor" href="#" target="_blank" rel="noopener noreferrer"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.card -->
+
+</div><!-- /.page-body -->
+
+<script>
+  // When served from the port-5000 static server, API calls must go to the
+  // backend (port 4000). Otherwise use same-origin (works for port-4000 direct access).
+  const API_BASE = window.location.port === '5000'
+    ? window.location.protocol + '//' + window.location.hostname + ':4000'
+    : window.location.origin;
+
+  let slots = [];
+  let selectedSlotId = null;
+
+  async function loadSlots() {
+    const loadingEl = document.getElementById('loading-msg');
+    const errorEl   = document.getElementById('error-msg');
+    const emptyEl   = document.getElementById('empty-msg');
+    const mainCard  = document.getElementById('main-card');
+
+    try {
+      const res = await fetch(API_BASE + '/scheduler/slots');
+      if (!res.ok) throw new Error('Failed to load slots (HTTP ' + res.status + ')');
+      const data = await res.json();
+      slots = data.slots || [];
+
+      loadingEl.style.display = 'none';
+
+      if (!slots.length) {
+        emptyEl.style.display = 'block';
+        return;
+      }
+
+      // Group slots by date
+      const container = document.getElementById('slots-container');
+      container.innerHTML = '';
+
+      let lastDate = null;
+      let currentGrid = null;
+
+      slots.forEach(slot => {
+        const start = new Date(slot.start);
+        const end   = new Date(slot.end);
+        const dateKey = start.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        const timeFrom = start.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        const timeTo   = end.toLocaleTimeString(undefined,   { hour: '2-digit', minute: '2-digit' });
+
+        if (dateKey !== lastDate) {
+          lastDate = dateKey;
+          const header = document.createElement('div');
+          header.className = 'date-header';
+          header.textContent = dateKey;
+          container.appendChild(header);
+          currentGrid = document.createElement('div');
+          currentGrid.className = 'slots-grid';
+          container.appendChild(currentGrid);
+        }
+
+        const pill = document.createElement('button');
+        pill.className = 'slot-pill';
+        pill.dataset.slotId = slot.id;
+        pill.innerHTML = `${timeFrom} – ${timeTo} <span class="pill-dur">${slot.durationMinutes}m</span>`;
+        pill.addEventListener('click', () => selectSlot(slot.id, pill));
+        currentGrid.appendChild(pill);
+      });
+
+      mainCard.style.display = 'block';
+
+    } catch (e) {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+      errorEl.textContent = '⚠ ' + (e.message || 'Failed to load available times.');
+    }
+  }
+
+  function selectSlot(slotId, pill) {
+    selectedSlotId = slotId;
+    document.querySelectorAll('.slot-pill').forEach(p => p.classList.remove('selected'));
+    if (pill) pill.classList.add('selected');
+  }
+
+  async function bookSlot() {
+    const bookBtn   = document.getElementById('book-btn');
+    const bookError = document.getElementById('book-error');
+    bookError.style.display = 'none';
+
+    if (!selectedSlotId) {
+      bookError.style.display = 'block';
+      bookError.textContent = 'Please select a time slot first.';
+      return;
+    }
+
+    const inviteeName  = document.getElementById('invitee-name').value.trim();
+    const inviteeEmail = document.getElementById('invitee-email').value.trim();
+    const notes        = document.getElementById('invitee-notes').value.trim();
+
+    if (!inviteeEmail) {
+      bookError.style.display = 'block';
+      bookError.textContent = 'Please enter your email address.';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteeEmail)) {
+      bookError.style.display = 'block';
+      bookError.textContent = 'Please enter a valid email address.';
+      return;
+    }
+
+    bookBtn.disabled = true;
+    bookBtn.innerHTML = '<span>⏳</span> Confirming…';
+
+    try {
+      const res = await fetch(API_BASE + '/scheduler/book', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ slotId: selectedSlotId, inviteeName, inviteeEmail, notes })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Booking failed (HTTP ' + res.status + ')');
+      }
+
+      // Build confirmation text
+      const slot = slots.find(s => s.id === selectedSlotId);
+      const start = slot ? new Date(slot.start) : null;
+      const dateTimeStr = start
+        ? start.toLocaleString(undefined, {
+            weekday: 'long', year: 'numeric', month: 'long',
+            day: 'numeric', hour: '2-digit', minute: '2-digit'
+          })
+        : '';
+
+      document.getElementById('slot-picker').style.display = 'none';
+      const confirmation = document.getElementById('confirmation');
+      confirmation.style.display = 'block';
+      document.getElementById('confirm-detail').innerHTML = dateTimeStr
+        ? 'Your meeting is confirmed for <strong>' + dateTimeStr + '</strong>.'
+        : 'Your meeting is confirmed.';
+
+      if (data.meetLink) {
+        const meetSection = document.getElementById('meet-link-section');
+        const meetAnchor  = document.getElementById('meet-link-anchor');
+        meetSection.style.display = 'block';
+        meetAnchor.href        = data.meetLink;
+        meetAnchor.textContent = data.meetLink;
+      }
+
+    } catch (e) {
+      bookBtn.disabled = false;
+      bookBtn.innerHTML = '<span>✔</span> Confirm Booking';
+      bookError.style.display = 'block';
+      bookError.textContent = '⚠ ' + (e.message || 'Something went wrong. Please try again.');
+    }
+  }
+
+  // Kick off on page load
+  loadSlots();
+</script>
+</body>
+</html>

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Talent Marketplace — FIOE</title>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Left Column Navigation -->
+  <link rel="stylesheet" href="nav-sidebar.css">
+  <script src="nav-sidebar.js" defer></script>
+  <style>
+    /* ── FIOE CSS vars — premium lounge (light Desired Dawn) ── */
+    :root {
+      --azure-dragon:  #073679;
+      --cool-blue:     #4c82b8;
+      --robins-egg:    #6deaf9;
+      --desired-dawn:  #d8d8d8;
+      --argent:        #87888a;
+      --black-beauty:  #222529;
+      /* lounge palette */
+      --bg-body:       #ebebeb;
+      --bg-card:       #ffffff;
+      --bg-card-hover: #faf9f7;
+      --border:        #d4d2ce;
+      --text-primary:  #222529;
+      --text-secondary: #5a5a5a;
+      --gold:          #b8892e;
+      --gold-light:    #c9a84c;
+      --theme-font:    'Inter', 'Roboto', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: var(--theme-font);
+      background: var(--bg-body);
+      color: var(--text-primary);
+    }
+
+    /* Scrollbar — premium subtle */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--desired-dawn); }
+    ::-webkit-scrollbar-thumb { background: var(--desired-dawn); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--argent); }
+
+    /* ── Page shell (sidebar + main) ── */
+    .page-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .page-main {
+      flex: 1;
+      padding: 32px 28px;
+      overflow-y: auto;
+      min-width: 0;
+    }
+
+    /* ── Header bar ── */
+    .community-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--desired-dawn);
+    }
+
+    .community-header .header-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--azure-dragon) 0%, var(--cool-blue) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(7,54,121,0.25);
+    }
+
+    .community-header h1 {
+      color: var(--black-beauty) !important;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--azure-dragon);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .community-header .subtitle {
+      font-size: 13px;
+      color: var(--gold);
+      margin-top: 5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-style: italic;
+      font-weight: 600;
+    }
+
+    /* ── 4-column grid (4×2 = 8 cards per viewport) ── */
+    .bulletin-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 24px;
+      overflow: visible;
+    }
+
+    @media (max-width: 1200px) { .bulletin-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 800px)  { .bulletin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 500px)  { .bulletin-grid { grid-template-columns: 1fr; } }
+
+    /* ── Bulletin card ── */
+    .bulletin-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: visible;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 8px rgba(34,37,41,0.10);
+      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+      position: relative;
+    }
+    .bulletin-card:hover {
+      box-shadow: 0 8px 28px rgba(7,54,121,0.14), 0 0 0 2px rgba(7,54,121,0.12);
+      transform: translateY(-3px);
+      border-color: rgba(7,54,121,0.25);
+      z-index: 10;
+    }
+
+    /* ── Card image / gradient banner ── */
+    .card-image {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, rgba(7,54,121,0.82) 0%, rgba(109,234,249,0.55) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 8px;
+      position: relative;
+      flex-shrink: 0;
+      overflow: hidden;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .card-image-role {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      line-height: 1.3;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.45);
+      word-break: break-word;
+    }
+
+    .card-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.55);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 3px 10px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Card body ── */
+    .card-body {
+      padding: 14px 16px 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--azure-dragon);
+      line-height: 1.3;
+      /* truncate to 2 lines */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.35;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-company {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold, #b8860b);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+
+    /* ── Card footer: "More" button ── */
+    .card-footer {
+      padding: 8px 16px 14px;
+      position: relative;
+    }
+
+    .btn-more {
+      background: transparent;
+      border: 1px solid rgba(7,54,121,0.3);
+      color: var(--azure-dragon);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 6px 18px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      width: 100%;
+      font-family: var(--theme-font);
+      letter-spacing: 0.04em;
+    }
+    .btn-more:hover {
+      background: rgba(7,54,121,0.07);
+      color: var(--azure-dragon);
+      border-color: var(--azure-dragon);
+    }
+
+    /* ── Hover name card — overlaps the card itself ── */
+    .name-card {
+      display: none;
+      position: absolute;
+      /* center the popover on top of the card, overlapping it */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 92%;
+      max-width: 320px;
+      background: var(--black-beauty);
+      border: 1px solid rgba(201,168,76,0.5);
+      border-radius: 14px;
+      box-shadow: 0 12px 40px rgba(34,37,41,0.50), 0 0 0 1px rgba(201,168,76,0.12);
+      z-index: 999;
+      padding: 16px 18px 14px;
+      pointer-events: none;
+    }
+
+    /* Show when JS adds the .show class (hover) or .pinned class (clicked) */
+    .name-card.show,
+    .name-card.pinned {
+      display: block;
+      pointer-events: auto;
+    }
+
+    .nc-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+      text-align: center;
+      border-bottom: 1px solid rgba(201,168,76,0.3);
+      padding-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .nc-profiles {
+      text-align: center;
+      font-size: 12px;
+      color: #d4d0c8;
+      margin-bottom: 8px;
+    }
+    .nc-profiles strong {
+      font-size: 15px;
+      color: var(--gold-light);
+    }
+
+    .nc-row {
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-size: 11px;
+    }
+    .nc-row:last-child { border-bottom: none; }
+
+    .nc-label {
+      font-weight: 700;
+      color: var(--gold-light);
+      flex-shrink: 0;
+      min-width: 72px;
+    }
+
+    .nc-value {
+      color: #d4d0c8;
+      word-break: break-word;
+    }
+
+    .nc-stars {
+      color: var(--gold-light);
+      letter-spacing: 1px;
+    }
+
+    .nc-contact-btn {
+      display: block;
+      margin-top: 12px;
+      padding: 7px 14px;
+      background: var(--gold-light);
+      color: #222529;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: opacity 0.15s;
+    }
+    .nc-contact-btn:hover { opacity: 0.85; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+    .empty-state svg { display: block; margin: 0 auto 16px; opacity: 0.25; }
+
+    /* ── Loading shimmer ── */
+    .shimmer {
+      background: linear-gradient(90deg, #e0deda 25%, #ece9e5 50%, #e0deda 75%);
+      background-size: 400% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+    .card-skeleton { border-radius: 10px; overflow: hidden; }
+    .card-skeleton .sk-image { height: 80px; }
+    .card-skeleton .sk-line { height: 10px; margin: 8px 12px; }
+    .card-skeleton .sk-btn  { height: 24px; margin: 6px 12px 10px; border-radius: 6px; }
+
+    /* ── Error banner ── */
+    .error-banner {
+      grid-column: 1 / -1;
+      background: rgba(192,57,43,0.08);
+      border: 1px solid rgba(192,57,43,0.35);
+      color: #c0392b;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 13px;
+    }
+
+    /* ── Collapsible Search Bar ── */
+    .search-section {
+      margin-bottom: 24px;
+    }
+
+    .search-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s, background 0.15s;
+      box-shadow: 0 1px 4px rgba(34,37,41,0.07);
+    }
+    .search-header:hover {
+      border-color: var(--cool-blue);
+      background: rgba(7,54,121,0.02);
+    }
+    .search-header.open {
+      border-radius: 10px 10px 0 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-header-icon {
+      color: var(--azure-dragon);
+      flex-shrink: 0;
+    }
+
+    .search-header-label {
+      flex: 1;
+      font-family: var(--theme-font);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--azure-dragon);
+    }
+
+    .search-chevron {
+      color: var(--argent);
+      font-size: 13px;
+      transition: transform 0.2s;
+    }
+    .search-header.open .search-chevron {
+      transform: rotate(90deg);
+    }
+
+    .search-body {
+      display: none;
+      padding: 14px 16px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-top: 0;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 4px 12px rgba(34,37,41,0.07);
+    }
+    .search-body.open { display: block; }
+
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 36px 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 14px;
+      font-family: var(--theme-font);
+      color: var(--text-primary);
+      background: #fafafa;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus {
+      border-color: var(--cool-blue);
+      background: #fff;
+    }
+    .search-input-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--argent);
+      font-size: 16px;
+      line-height: 1;
+      display: none;
+    }
+    .search-input-clear.visible { display: block; }
+
+    .search-btn {
+      padding: 8px 18px;
+      background: var(--azure-dragon);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--theme-font);
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .search-btn:hover { background: var(--cool-blue); }
+
+    .search-clear-btn {
+      padding: 8px 14px;
+      background: transparent;
+      color: var(--argent);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: var(--theme-font);
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .search-clear-btn:hover { color: var(--azure-dragon); border-color: var(--cool-blue); }
+
+    .search-hint {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--argent);
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-shell page-shell--hover-sidebar">
+
+  <!-- ===== Left Navigation Sidebar ===== -->
+  <nav class="nav-sidebar" aria-label="Main navigation">
+    <a href="http://localhost:4000/LookerDashboard.html" class="nav-sidebar__brand">
+      <img src="/fioe-logo.svg" alt="FIOE" class="nav-sidebar__logo" />
+    </a>
+    <ul class="nav-sidebar__list">
+
+      <!-- Login with hover-expand sub-menu -->
+      <li class="nav-sidebar__item nav-sidebar__item--has-sub">
+        <span class="nav-sidebar__link" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+          <svg class="nav-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          <span>Login</span>
+          <svg class="nav-sidebar__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="11" height="11"><polyline points="9 18 15 12 9 6"/></svg>
+        </span>
+        <ul class="nav-sidebar__submenu" role="menu">
+          <li><a href="http://localhost:8091/login.html" class="nav-sidebar__submenu-link" role="menuitem">Subscriber</a></li>
+          <li><a href="http://localhost:8091/sales_rep_register.html" class="nav-sidebar__submenu-link" role="menuitem">Staff</a></li>
+        </ul>
+      </li>
+
+      <li class="nav-sidebar__divider"></li>
+
+      <li class="nav-sidebar__item">
+        <a href="http://localhost:4000/LookerDashboard.html" class="nav-sidebar__link">
+          <svg class="nav-sidebar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Home</span>
+        </a>
+      </li>
+
+      <li class="nav-sidebar__divider"></li>
+
+      <li class="nav-sidebar__item nav-sidebar__item--has-sub">
+        <span class="nav-sidebar__link" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+          <svg class="nav-sidebar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Services</span>
+          <svg class="nav-sidebar__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="11" height="11"><polyline points="9 18 15 12 9 6"/></svg>
+        </span>
+        <ul class="nav-sidebar__submenu" role="menu">
+          <li><a href="http://localhost:8091/AutoSourcing.html" class="nav-sidebar__submenu-link" role="menuitem">Autosourcing</a></li>
+          <li><a href="http://localhost:8091/SourcingVerify.html" class="nav-sidebar__submenu-link" role="menuitem">Talent Evaluation</a></li>
+          <li><a href="http://localhost:3000/" class="nav-sidebar__submenu-link" role="menuitem">Candidate Management</a></li>
+          <li><a href="http://localhost:4000/LookerDashboard.html" class="nav-sidebar__submenu-link" role="menuitem">Consulting Dashboard</a></li>
+        </ul>
+      </li>
+
+      <li class="nav-sidebar__divider"></li>
+
+      <li class="nav-sidebar__item">
+        <a href="#ai-agent" class="nav-sidebar__link">
+          <svg class="nav-sidebar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>AI Agent</span>
+        </a>
+      </li>
+
+      <li class="nav-sidebar__item">
+        <a href="http://localhost:8091/api_porting.html" class="nav-sidebar__link">
+          <svg class="nav-sidebar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+          <span>API Porting</span>
+        </a>
+      </li>
+
+      <li class="nav-sidebar__item">
+        <a href="community.html" class="nav-sidebar__link active">
+          <svg class="nav-sidebar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          <span>Marketplace</span>
+        </a>
+      </li>
+
+      <li class="nav-sidebar__item">
+        <a href="#contact" class="nav-sidebar__link">
+          <svg class="nav-sidebar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>Contact Us</span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+  <!-- ===== End Sidebar ===== -->
+
+  <!-- ===== Main Content ===== -->
+  <main class="page-main" id="communityMain">
+
+    <div class="community-header">
+      <div class="header-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div>
+        <h1>Talent Marketplace</h1>
+        <p class="subtitle">The lounge for premium talent.</p>
+      </div>
+    </div>
+
+    <!-- ── Collapsible Search Bar ── -->
+    <div class="search-section">
+      <div class="search-header" id="searchHeader" onclick="toggleSearchBar()">
+        <span class="search-header-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        <span class="search-header-label">Search &amp; Filter</span>
+        <span class="search-chevron" id="searchChevron">▶</span>
+      </div>
+      <div class="search-body" id="searchBody">
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <input
+              type="search"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search by role, skill, seniority, country, sector, job family, rating…"
+              autocomplete="off"
+              oninput="onSearchInput()"
+              onkeydown="if(event.key==='Enter') applySearch()"
+              aria-label="Search talent marketplace"
+            />
+            <span class="search-input-clear" id="searchClearX" onclick="clearSearch()">✕</span>
+          </div>
+          <button class="search-btn" type="button" onclick="applySearch()">Search</button>
+          <button class="search-clear-btn" type="button" onclick="clearSearch()">Clear</button>
+        </div>
+        <p class="search-hint">Searches role tag, skillsets, seniority, country, sector, job family and avg rating.</p>
+      </div>
+    </div>
+
+    <div class="bulletin-grid" id="bulletinGrid">
+      <!-- Skeleton placeholders while loading -->
+      <div class="bulletin-card card-skeleton" id="sk1">
+        <div class="shimmer sk-image"></div>
+        <div class="shimmer sk-line" style="width:80%"></div>
+        <div class="shimmer sk-line" style="width:55%"></div>
+        <div class="shimmer sk-btn"></div>
+      </div>
+      <div class="bulletin-card card-skeleton" id="sk2">
+        <div class="shimmer sk-image"></div>
+        <div class="shimmer sk-line" style="width:75%"></div>
+        <div class="shimmer sk-line" style="width:60%"></div>
+        <div class="shimmer sk-btn"></div>
+      </div>
+      <div class="bulletin-card card-skeleton" id="sk3">
+        <div class="shimmer sk-image"></div>
+        <div class="shimmer sk-line" style="width:70%"></div>
+        <div class="shimmer sk-line" style="width:50%"></div>
+        <div class="shimmer sk-btn"></div>
+      </div>
+      <div class="bulletin-card card-skeleton" id="sk4">
+        <div class="shimmer sk-image"></div>
+        <div class="shimmer sk-line" style="width:85%"></div>
+        <div class="shimmer sk-line" style="width:45%"></div>
+        <div class="shimmer sk-btn"></div>
+      </div>
+    </div>
+
+  </main>
+  <!-- ===== End Main ===== -->
+
+</div><!-- end page-shell -->
+
+<script>
+(function () {
+  'use strict';
+
+  // ── module-level state ────────────────────────────────────────────────────────
+  var allBulletins = [];
+  var searchQuery  = '';
+
+  // ── Search bar helpers ───────────────────────────────────────────────────────
+  window.toggleSearchBar = function () {
+    var header = document.getElementById('searchHeader');
+    var body   = document.getElementById('searchBody');
+    var open   = body.classList.toggle('open');
+    header.classList.toggle('open', open);
+  };
+
+  window.onSearchInput = function () {
+    var val = document.getElementById('searchInput').value;
+    var clr = document.getElementById('searchClearX');
+    clr.classList.toggle('visible', val.length > 0);
+  };
+
+  window.applySearch = function () {
+    searchQuery = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    renderGrid(filterBulletins());
+  };
+
+  window.clearSearch = function () {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchClearX').classList.remove('visible');
+    searchQuery = '';
+    renderGrid(filterBulletins());
+  };
+
+  function filterBulletins() {
+    if (!searchQuery) return allBulletins;
+    return allBulletins.filter(function (b) {
+      var text = [
+        b.role_tag,
+        b.headline || '',
+        b.description || '',
+        b.seniority,
+        Array.isArray(b.skillsets) ? b.skillsets.join(' ') : (b.skillsets || ''),
+        Array.isArray(b.country)   ? b.country.join(' ')   : (b.country   || ''),
+        b.sector,
+        b.jobfamily,
+        String(b.avg_rating || '')
+      ].join(' ').toLowerCase();
+      return text.includes(searchQuery);
+    });
+  }
+
+  // ── helpers ─────────────────────────────────────────────────────────────────
+
+  /** Convert an avg_rating value to filled/empty stars (out of 5) */
+  function ratingStars(ratingStr) {
+    if (!ratingStr) return '';
+    const num = parseInt(String(ratingStr), 10);
+    if (isNaN(num)) return String(ratingStr);
+    // rating is stored as a percentage (0–100); convert to a 5-star score.
+    // Multiply by 2 then divide by 2 so we can round to the nearest half-star.
+    const out5 = Math.round((num / 100) * 5 * 2) / 2;
+    const fullStars  = Math.floor(out5);
+    const halfStar   = out5 - fullStars >= 0.5 ? 1 : 0;
+    const emptyStars = 5 - fullStars - halfStar;
+    const FULL  = '★', HALF = '⭑', EMPTY = '☆';
+    return (
+      '<span class="nc-stars">' +
+      FULL.repeat(fullStars) +
+      (halfStar ? HALF : '') +
+      EMPTY.repeat(emptyStars) +
+      '</span> <span style="font-size:10px;color:var(--argent)">(' + num + '%)</span>'
+    );
+  }
+
+  /** Gradient hue based on role_tag string (deterministic) — dark lounge palette */
+  function gradientForRole(roleTag) {
+    let hash = 0;
+    for (let i = 0; i < (roleTag || '').length; i++) hash = roleTag.charCodeAt(i) + ((hash << 5) - hash);
+    const hue = Math.abs(hash) % 360;
+    // Dark lounge gradients: near-black → muted hue with gold sheen
+    return 'linear-gradient(135deg, hsl(' + hue + ',40%,14%) 0%, hsl(' + ((hue + 25) % 360) + ',35%,28%) 100%)';
+  }
+
+  /** Sort seniority values junior → senior, joined by commas */
+  var SENIORITY_RANK_MAP = {intern:0,trainee:0,graduate:0,entry:0,junior:1,jr:1,associate:2,mid:3,intermediate:3,senior:4,sr:4,lead:5,principal:5,specialist:5,manager:6,mgr:6,director:7,dir:7,vp:8,vice:8,head:9,chief:9};
+  function senRank(s) {
+    var lower = (s || '').toLowerCase();
+    return Object.entries(SENIORITY_RANK_MAP).reduce(function(r,e){return lower.indexOf(e[0]) !== -1 ? Math.max(r,e[1]) : r;}, -1);
+  }
+  function sortedSeniority(senStr) {
+    if (!senStr || senStr === '—') return senStr;
+    var parts = String(senStr).split(/\s*[→,|]\s*/).map(function(s){return s.trim();}).filter(Boolean);
+    parts.sort(function(a,b){return senRank(a) - senRank(b);});
+    return [...new Set(parts)].join(', ') || senStr;
+  }
+
+  /** Format an array or string as a comma-separated display */
+  function fmt(val) {
+    if (Array.isArray(val)) return val.join(', ') || '—';
+    return val || '—';
+  }
+
+  function defaultDesc(sector, seniority) {
+    var s = sector || '—', sen = seniority ? sortedSeniority(seniority) : '—';
+    if (s !== '—') return s + (sen !== '—' ? ' · ' + sen : '');
+    return sen;
+  }
+
+  // ── Build a single card element ──────────────────────────────────────────────
+  function buildCard(b) {
+    const roleTag     = b.role_tag     || 'Role';
+    const headline    = b.headline     || roleTag;
+    const description = b.description || defaultDesc(b.sector, b.seniority);
+    const skills      = b.skillsets    || [];
+    const seniority   = sortedSeniority(b.seniority || '—');
+    const profiles    = b.available_profiles != null ? b.available_profiles : '—';
+    const countries   = b.country      || [];
+    const jobfamily   = b.jobfamily    || '—';
+    const sector      = b.sector       || '—';
+    const avgRating   = b.avg_rating;
+    const email       = b.email        || null;
+    const skillStr    = Array.isArray(skills) ? skills.join(', ') : (skills || '—');
+    const countryStr  = fmt(countries);
+
+    const card = document.createElement('div');
+    card.className = 'bulletin-card';
+
+    // ── image banner
+    const img = document.createElement('div');
+    img.className = 'card-image';
+    // Strict validation: only accept well-formed base64 data URLs for common image MIME types
+    const safeImageDataRe = /^data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,[A-Za-z0-9+/]+=*$/;
+    if (b.image_data && safeImageDataRe.test(b.image_data)) {
+      img.style.background = 'none';
+      img.style.backgroundImage = 'url("' + b.image_data + '")';
+      img.style.backgroundSize = 'cover';
+      img.style.backgroundPosition = 'center';
+    } else {
+      img.style.background = gradientForRole(roleTag);
+    }
+    img.innerHTML =
+      '<span class="card-image-role">' + escHtml(roleTag) + '</span>' +
+      '<span class="card-badge">' + profiles + ' profiles</span>';
+
+    // ── body
+    const body = document.createElement('div');
+    body.className = 'card-body';
+    const companyName = b.company_name || null;
+    body.innerHTML =
+      '<div class="card-title">' + escHtml(headline) + '</div>' +
+      '<div class="card-desc">' + escHtml(description) + '</div>' +
+      (companyName ? '<div class="card-company">' + escHtml(companyName) + '</div>' : '');
+
+    // ── footer + More button + hover name card
+    const footer = document.createElement('div');
+    footer.className = 'card-footer';
+
+    const btn = document.createElement('button');
+    btn.className = 'btn-more';
+    btn.type = 'button';
+    btn.textContent = 'More';
+
+    const nc = document.createElement('div');
+    nc.className = 'name-card';
+    nc.innerHTML =
+      '<div class="nc-title">' + escHtml(roleTag) + '</div>' +
+      '<div class="nc-profiles">Available Profiles: <strong>' + profiles + '</strong></div>' +
+      '<div class="nc-row"><span class="nc-label">Top Skills:</span><span class="nc-value">' + escHtml(skillStr) + '</span></div>' +
+      '<div class="nc-row"><span class="nc-label">Seniority:</span><span class="nc-value">' + escHtml(seniority) + '</span></div>' +
+      '<div class="nc-row"><span class="nc-label">Country:</span><span class="nc-value">' + escHtml(countryStr) + '</span></div>' +
+      '<div class="nc-row"><span class="nc-label">Job Family:</span><span class="nc-value">' + escHtml(jobfamily) + '</span></div>' +
+      '<div class="nc-row"><span class="nc-label">Sector:</span><span class="nc-value">' + escHtml(sector) + '</span></div>' +
+      '<div class="nc-row"><span class="nc-label">Avg. Rating:</span><span class="nc-value">' + ratingStars(avgRating) + '</span></div>' +
+      (email ? '<a class="nc-contact-btn" href="mailto:' + encodeURIComponent(email) + '?subject=' + encodeURIComponent('Talent Inquiry: ' + roleTag) + '" target="_blank" rel="noopener noreferrer">✉ Contact</a>' : '');
+
+    // Hover: show popover on More button hover; hide on card-footer mouse-leave unless pinned
+    btn.addEventListener('mouseenter', function () { nc.classList.add('show'); });
+    footer.addEventListener('mouseleave', function () { if (!nc.classList.contains('pinned')) nc.classList.remove('show'); });
+
+    // Click: toggle pin so popover stays open until user clicks outside
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var pinned = nc.classList.toggle('pinned');
+      if (pinned) { nc.classList.add('show'); } else { nc.classList.remove('show'); }
+    });
+
+    footer.appendChild(btn);
+    footer.appendChild(nc);
+
+    card.appendChild(img);
+    card.appendChild(body);
+    card.appendChild(footer);
+
+    return card;
+  }
+
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Render grid ──────────────────────────────────────────────────────────────
+  function renderGrid(bulletins) {
+    const grid = document.getElementById('bulletinGrid');
+    grid.innerHTML = '';
+
+    if (!bulletins || bulletins.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.innerHTML =
+        '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>' +
+        '<p>No bulletin posts yet.<br><small>Bulletin files are created when a user performs a DB Dock Out with the bulletin toggle ON.</small></p>';
+      grid.appendChild(empty);
+      return;
+    }
+
+    bulletins.forEach(function (b) {
+      grid.appendChild(buildCard(b));
+    });
+  }
+
+  // ── Fetch from server ────────────────────────────────────────────────────────
+  // Use window.location.origin when served from the Node server;
+  // fall back to localhost:4000 when opened as a file:// URL.
+  const API_BASE = (window.location.protocol === 'file:' || !window.location.host)
+    ? 'http://localhost:4000'
+    : window.location.origin;
+
+  function loadBulletins() {
+    fetch(API_BASE + '/community/bulletins', { credentials: 'include' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        allBulletins = data.bulletins || [];
+        renderGrid(filterBulletins());
+      })
+      .catch(function (err) {
+        var grid = document.getElementById('bulletinGrid');
+        grid.innerHTML =
+          '<div class="error-banner">Could not load bulletin data: ' + escHtml(String(err.message)) + '</div>';
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', loadBulletins);
+
+  // Close any pinned name-card popover when clicking outside it
+  document.addEventListener('click', function (e) {
+    document.querySelectorAll('.name-card.pinned').forEach(function (nc) {
+      if (!nc.contains(e.target)) {
+        nc.classList.remove('pinned');
+        nc.classList.remove('show');
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

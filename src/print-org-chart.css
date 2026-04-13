@@ -1,0 +1,50 @@
+@media print {
+  /* Constrain to a single page with no browser margins */
+  @page { margin: 0; size: auto; }
+
+  /* Hide all page chrome */
+  body { visibility: hidden !important; }
+
+  /* Reveal only the org chart tree */
+  #org-chart-content {
+    visibility: visible !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    background: #fff !important;
+    z-index: 9999 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  #org-chart-content * {
+    visibility: visible !important;
+    overflow: visible !important;
+  }
+
+  /* Prevent individual org nodes from splitting across pages */
+  #org-chart-content .org-group,
+  #org-chart-content .org li {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Expand scrollable org-chart containers so the full tree prints */
+  #org-chart-content .org-chart-scroll,
+  #org-chart-content .org-group,
+  #org-chart-content .org-tree-root,
+  #org-chart-content .org-center-wrapper {
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    max-width: none !important;
+    max-height: none !important;
+    width: auto !important;
+    height: auto !important;
+  }
+}

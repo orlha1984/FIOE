@@ -1,0 +1,1446 @@
+/* Affected section (Design Enhancement): Updated to a Cyberpunk / I, Robot inspired palette and typography. */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  /* Palette mapped from provided reference */
+  --bg:#ffffff;
+  --card:#ffffff;
+  --muted:#222529;
+
+  --desired-dawn: #d8d8d8;
+  --robins-egg:  #6deaf9;
+  --argent:      #87888a;
+  --cool-blue:   #4c82b8;
+  --azure-dragon:#073679;
+  --black-beauty:#222529;
+
+  /* Map legacy tokens to the new palette where appropriate */
+  --accent: var(--azure-dragon);
+  --accent-border: var(--cool-blue);
+  --accent-alt: var(--robins-egg);
+
+  --danger:#ea4335;
+  --danger-border:#d93025;
+  --neutral-border:#e0e0e0;
+  --radius:8px;
+  --shadow:0 6px 18px rgba(34,34,34,0.08);
+  --gradient-toolbar:linear-gradient(180deg,#ffffff,#fbfbfc);
+  --primary-700:#143d8c;
+  --primary-500:var(--azure-dragon);
+  --success-600:#188038;
+  --muted-600:#5f6368;
+  --card-elev: rgba(7,54,121,0.06);
+  --metric-bg:#f5f7ff;
+  --metric-border:#e6eff9;
+  --metric-pill:#f1f5ff;
+  
+  /* Data Sorter Specific Tokens */
+  --panel:#ffffff;
+  --panel-alt:#fbfcfd;
+  --border:#d8dde2;
+  --border-strong:#b7c6d6;
+  --accent-2: var(--cool-blue);
+  --accent-glow: rgba(109,234,249,0.08);
+  --text: var(--black-beauty);
+  --text-soft:#5f6368;
+  --chip-bg:#eef6ff;
+  --chip-border:#d3e8f4;
+  --badge: var(--azure-dragon);
+  --radius-sm:6px;
+  --elevation:0 12px 32px -12px rgba(7,54,121,0.12);
+  --theme-font: "Roboto Condensed", "Orbitron", 'Inter', sans-serif;
+
+  /* Card / tile background — lighter Desired Dawn for FIOE branding consistency */
+  --bg-card: #ebebeb;
+
+  /* weightage specific */
+  --weight-card-bg: #fff;
+  --weight-card-border: #e6eef8;
+  --weight-slider-track: linear-gradient(90deg, var(--robins-egg), var(--cool-blue));
+}
+
+/* Use the requested condensed font globally (Roboto Condensed) while keeping Orbitron for display headings */
+body { font-family: "Roboto Condensed", "Orbitron", system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif; margin:24px; background:var(--bg); color:var(--muted); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+
+/* Header Layout Update */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--neutral-border);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.panel-header h1 { 
+  margin: 0; 
+  font-size: 1.8rem; 
+  font-weight: 700; 
+  letter-spacing: .5px; 
+  color: var(--black-beauty); 
+  font-family: "Orbitron", "Roboto Condensed", sans-serif;
+}
+
+/* CMS page-level heading – matches panel-header h1 with azure-dragon accent */
+.cms-page-title {
+  font-size: 1.8rem;
+  margin: 0 0 24px;
+  font-weight: 700;
+  color: var(--black-beauty);
+  letter-spacing: .5px;
+  font-family: "Orbitron", "Roboto Condensed", sans-serif;
+}
+
+/* Tabs Styling */
+.tabs-nav { 
+  display: flex; 
+  gap: 12px; 
+  margin-bottom: 0; 
+  border-bottom: none; 
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 0;
+  font-family: "Roboto Condensed", "Orbitron", sans-serif;
+  font-size: 13px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.tab-btn.active {
+  background: #fff;
+  border-color: var(--accent-border);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-border);
+}
+
+.tab-btn:hover:not(.active) {
+  background: #f8fafc;
+  color: var(--cool-blue);
+  border-color: var(--border-strong);
+}
+
+.tab-pane { display: none; animation: fade .28s ease-in; }
+.tab-pane.active { display: block; }
+
+#toolbar { display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; padding:12px 14px; background:var(--gradient-toolbar); border:1px solid var(--neutral-border); border-radius:var(--radius); box-shadow:var(--shadow); }
+
+/* Buttons */
+button { cursor:pointer; padding:8px 16px; border-radius:8px; border:1px solid var(--accent-border); background:var(--accent); color:#fff; font-size:13px; font-weight:700; line-height:1.2; letter-spacing:.2px; box-shadow:0 4px 12px rgba(7,54,121,0.1), 0 0 10px rgba(109,234,249,0.04); transition:background .12s ease, box-shadow .12s ease, transform .06s ease; }
+button:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 16px rgba(7,54,121,0.15); }
+button:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+
+/* Toggle Switch Styling */
+.toggle-switch {
+  position: relative; display: inline-block; width: 44px; height: 24px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s; border-radius: 24px;
+}
+.toggle-slider:before {
+  position: absolute; content: "";
+  height: 18px; width: 18px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .4s; border-radius: 50%;
+}
+input:checked + .toggle-slider { background-color: var(--accent); }
+input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+.toggle-label {
+    font-size: 13px; font-weight: 700; color: #374151; display: flex; align-items: center; gap: 8px;
+}
+
+/* Segmented Control */
+.segmented-control {
+  display: inline-flex;
+  background: #eef2f6;
+  border-radius: 8px;
+  padding: 4px;
+  border: 1px solid var(--neutral-border);
+}
+.segmented-control input { display: none; }
+.segmented-control label {
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.segmented-control input:checked + label {
+  background: #fff;
+  color: var(--azure-dragon);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+#status { font-size:12px; color:#374151; min-width:240px; background:#fff; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; box-shadow:var(--card-elev); }
+
+/* Table Update */
+table { border-collapse:separate; border-spacing:0; width:100%; background:#fff; border:1px solid var(--neutral-border); border-radius:10px; overflow:hidden; font-size:14px; box-shadow:0 8px 30px -10px rgba(31,111,235,0.08); }
+th, td { border-bottom:1px solid #e5e9ed; padding:16px 18px; vertical-align:middle; }
+th { background:#fff; border-bottom: 2px solid #e5e9ed; font-weight:700; color:#1f2328; text-align:left; font-size:13px; letter-spacing:.3px; text-transform: uppercase; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background-color: #f8fafc; }
+
+td[contenteditable="true"] { background:transparent; }
+td[contenteditable="true"]:focus { background:#fffef5; outline:2px solid rgba(7,54,121,0.14); }
+.checkbox-cell { text-align:center; width:48px; }
+
+/* Avatar Styles for Table */
+.name-cell-wrapper { display: flex; align-items: center; gap: 14px; }
+.table-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #f1f5f9; color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+.name-text { font-weight: 600; color: #111827; font-family: "Roboto Condensed", sans-serif; }
+
+/* Buttons in Table (View Details) */
+.view-btn { 
+  background: #fff; 
+  border: 1px solid var(--accent); 
+  color: var(--accent); 
+  padding: 8px 16px; 
+  font-size: 12px; 
+  font-weight: 700; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  letter-spacing: .2px; 
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+.view-btn:hover { 
+  background: #eff6ff; 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+  filter: none;
+}
+.view-btn.assessment-complete {
+  background: #f0fdf4;
+  border-color: #16a34a;
+  color: #15803d !important;
+}
+
+#deleteBtn { display:none; background:var(--danger); border-color:var(--danger-border); box-shadow:none; border-radius:10px; padding:8px 14px; }
+#deleteBtn:hover { background:#a80f1f; }
+.readonly { color:var(--primary-500); }
+.spinner { width:18px; height:18px; border:3px solid #d0d7de; border-top-color:var(--primary-500); border-radius:50%; animation:spin 1s linear infinite; display:inline-block; }
+@keyframes spin { to { transform:rotate(360deg); } }
+#reloadBtn { background:#6e7781; border-color:#57606a; box-shadow:none; border-radius:10px; }
+#reloadBtn:hover { background:#57606a; }
+.fade-in { animation: fade .28s ease-in; }
+@keyframes fade { from { opacity:0 } to { opacity:1 } }
+.error { color:var(--danger); font-weight:700; }
+.success { color:#1f7a37; font-weight:700; }
+.dirty-flag { font-size:10px; color:#9a6700; margin-left:4px; font-weight:700; }
+.metrics { display:flex; align-items:center; gap:12px; padding:8px 12px; background:var(--metric-bg); border:1px solid var(--metric-border); border-radius:12px; font-size:13px; color:#1f2328; }
+.metric strong { color:#1f2328; font-weight:700; }
+
+/* Export/action buttons */
+#exportExcelBtn { background: linear-gradient(180deg,var(--cool-blue),#3f78bb); border-color:#2f63a0; box-shadow:0 8px 18px rgba(76,130,184,0.15); border-radius:10px; }
+#exportCsvBtn { background: linear-gradient(180deg,var(--robins-egg),#27dff1); border-color:#1bbfda; box-shadow:0 8px 18px rgba(109,234,249,0.12); border-radius:10px; color:#1f2328; font-weight:700; }
+#sortScoreBtn { background: linear-gradient(180deg,var(--cool-blue),var(--azure-dragon)); border-color:var(--azure-dragon); color:white; box-shadow:0 8px 18px rgba(7,54,121,0.2); border-radius:10px; font-weight:700; }
+#bulkUploadBtn { background: linear-gradient(180deg,#ffffff,var(--desired-dawn)); color:var(--black-beauty); border-color:var(--argent); box-shadow:0 2px 5px rgba(34,37,41,0.1); border-radius:10px; font-weight:700; }
+
+#marketAnalysisBtn { display:none; }
+
+/* Assessment styles */
+.assessment-result-container { font-size: 12px; line-height: 1.4; color: var(--black-beauty); }
+.assessment-stars { color: var(--border); letter-spacing: 1px; font-size: 14px; }
+.assessment-stars .filled { color: #f59e0b; }
+.assessment-header { font-weight: 700; font-size: 12px; margin-bottom: 4px; color: var(--azure-dragon); }
+.assessment-comments { color: var(--argent); font-size: 11px; margin: 4px 0; font-style: italic; }
+
+/* Category Appraisals Table Styling */
+.category-appraisals {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--neutral-border);
+}
+
+.category-appraisals-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--black-beauty);
+    margin-bottom: 8px;
+}
+
+.category-appraisals-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border: 1px solid var(--neutral-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.category-appraisals-table thead {
+    background: var(--bg-card);
+    border-bottom: 2px solid var(--neutral-border);
+}
+
+.category-appraisals-table th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--argent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.category-appraisals-table th:last-child {
+    text-align: center;
+}
+
+.category-appraisals-table tbody tr {
+    border-bottom: 1px solid var(--neutral-border);
+    transition: background-color 0.15s ease;
+}
+
+.category-appraisals-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.category-appraisals-table tbody tr:hover {
+    background-color: rgba(109,234,249,0.08);
+}
+
+.category-appraisals-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+}
+
+.category-appraisals-table .category-name {
+    color: var(--black-beauty);
+    font-weight: 500;
+}
+
+.category-appraisals-table .category-weight {
+    color: var(--argent);
+    font-size: 11px;
+    text-align: right;
+    padding-right: 16px;
+}
+
+.category-appraisals-table .category-rating {
+    text-align: center;
+    color: #f59e0b;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+/* Namecard styles */
+.sv-namecard {
+  border: 1px solid #eef3f8;
+  border-radius: 12px;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  align-items: start;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(7,54,121,0.04);
+  font-size: 13px;
+  color: #111827;
+  margin-top: 20px;
+}
+.sv-namecard .sv-left { display:flex; flex-direction:column; gap:8px; }
+.sv-namecard .sv-name { font-weight: 800; font-size: 22px; color: var(--azure-dragon); margin-bottom: 4px; font-family: "Roboto Condensed", "Orbitron", sans-serif; }
+.sv-namecard .sv-job { font-weight: 700; color: #374151; font-size: 15px; font-family: "Roboto Condensed", sans-serif; }
+.sv-namecard .sv-company { font-weight: 700; color: #111827; font-size: 14px; font-family: "Roboto Condensed", sans-serif; }
+.sv-namecard .sv-sector { font-size: 13px; color: #6b7280; font-family: "Roboto Condensed", sans-serif; }
+
+.sv-namecard .sv-assess-btn {
+  display:inline-block; padding:10px 16px; border-radius:8px; background:#0a66c2; color:#fff; text-decoration:none; font-weight:700; border: none; cursor:pointer;
+  margin-top: 16px; width: 100%; text-align:center;
+}
+.sv-right-col { display:flex; flex-direction:column; gap:16px; }
+
+/* Keep rebate-chip for skillset/product bubble tags */
+.rebate-chip { display:inline-block; background:#eef2ff; border:1px solid #d0d7de; padding:4px 8px; font-size:11px; border-radius:6px; margin-right:6px; color:#1f2328; font-weight:600; }
+
+/* Ensure skillset and product columns can render bubble tags */
+.sv-namecard .sv-skillset-col {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 14px 16px; border: 1px solid #d0d7de; border-radius: 10px;
+  background: #f8fafc; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  min-height: 80px; box-sizing: border-box;
+}
+.sv-namecard .sv-skillset-head { font-weight: 800; font-size: 13px; letter-spacing: .3px; color: #0f1724; margin: 0; }
+.sv-namecard .sv-skillset-list { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; min-height: 24px; }
+
+/* Product bubble (reuse rebate-chip style) */
+.sv-product-col { display:flex; flex-direction:column; gap:8px; }
+.sv-product-col .sv-skillset-list { /* reuse bubble listing behavior */ }
+
+/* keep .count-bubble used across DS and checkbox labels */
+.ds-checkbox-group label .count-bubble,
+.count-bubble {
+  display:inline-block;
+  min-width:20px;
+  height:20px;
+  line-height:20px;
+  padding:0 6px;
+  border-radius:999px;
+  background:#eef6ff;
+  color:var(--accent-2);
+  border:1px solid var(--chip-border);
+  font-size:0.78rem;
+  font-weight:700;
+  margin-left:6px;
+}
+
+/* pager & misc */
+.sv-namecard .sv-experience { 
+  white-space: pre-wrap; line-height: 1.6; color: #111827; font-size:14px;
+  border: 1px solid #f0f0f0; border-radius:10px; padding:16px; background:#fff;
+}
+.sv-jobfamily-label { color:#0f1724; font-weight:800; letter-spacing:0.3px; }
+.sv-seniority { font-size:13px; color:#6b7280; margin:0 0 4px 0; font-weight: 500; }
+.sv-exp-years { font-size:13px; color:#6b7280; margin:0 0 4px 0; }
+
+.pager { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.pager button { background:#eaeef2; color:#1f2328; border-color:#d0d7de; font-size:12px; padding:6px 12px; border-radius:8px; }
+
+/* Rebate Notice Refined */
+#rebateNotice { 
+  background:transparent; 
+  border:none; 
+  padding:0; 
+  font-size:13px; 
+  line-height:1.5; 
+  margin:0 0 20px 0; 
+  color:#4b5563; 
+  box-shadow:none; 
+}
+#rebateNotice b { color:#111827; font-size: 14px; }
+.rebate-actions { display: flex; gap: 10px; margin-top: 10px; }
+.token-counter { 
+  display:inline-flex; 
+  align-items: center;
+  justify-content: center;
+  background:#fff; 
+  border:1px solid #1f6feb; 
+  color:#1f6feb; 
+  padding:6px 12px; 
+  border-radius:20px; 
+  font-size:12px; 
+  font-weight:600; 
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* New Deep Research Container */
+#tab-research { display: none; min-height: 75vh; }
+#tab-research.active { display: block; }
+
+@media (max-width:720px){
+  th, td { padding:6px 8px; font-size:12.5px; }
+  .panel-header { flex-direction: column; align-items: flex-start; }
+  .metrics { width:100%; order:10; justify-content:space-between; }
+  .pager { justify-content:center; }
+  #status { flex:1 0 100%; }
+  .sv-namecard { grid-template-columns: 1fr; }
+}
+.star-rating { display: inline-flex; gap: 4px; font-size: 16px; color: #d1d5db; }
+
+/* =========================
+   RESTORED ORIGINAL WEIGHTAGE DESIGN
+   (keeps current font settings)
+   ========================= */
+
+/* Weightage Config Styles (original) */
+.weight-config-panel {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.weight-config-header {
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 13px;
+  color: #334155;
+  background: #f1f5f9;
+}
+.weight-config-header:hover {
+  background: #e2e8f0;
+}
+.weight-config-content {
+  display: none;
+  padding: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+.weight-config-content.open {
+  display: block;
+}
+.weight-sliders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+.weight-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.weight-slider-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  display: flex;
+  justify-content: space-between;
+}
+.weight-slider-group input[type=range] {
+  width: 100%;
+  cursor: pointer;
+}
+.weight-total {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+  color: #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.weight-total.invalid {
+  color: var(--danger);
+}
+.btn-reset-weights {
+    background: #e2e8f0; border: 1px solid #cbd5e1; color: #475569; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer;
+}
+.btn-reset-weights:hover {
+    background: #cbd5e1;
+}
+
+/* Review Tab */
+.status-badge {
+    display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+}
+.status-badge.pending { background: var(--bg-card); color: var(--argent); border: 1px solid var(--neutral-border); }
+.status-badge.processing { background: rgba(109,234,249,0.10); color: var(--cool-blue); border: 1px solid var(--robins-egg); animation: pulse 1.5s infinite; }
+.status-badge.completed { background: #ecfdf5; color: #10b981; border: 1px solid #d1fae5; }
+.status-badge.error { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+
+@keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+/* DockIn / DB Analytic loading bar shimmer animation */
+@keyframes dock-bar-shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+/* Indeterminate loading bar (non-analytic bulk upload) */
+@keyframes dock-bar-indeterminate {
+  0%   { left: -40%; width: 40%; }
+  50%  { left: 40%;  width: 50%; }
+  100% { left: 110%; width: 40%; }
+}
+.dock-progress-indeterminate {
+  position: relative;
+  overflow: hidden;
+  background: var(--border);
+  border-radius: 8px;
+  height: 14px;
+}
+.dock-progress-indeterminate::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  background: linear-gradient(90deg, #073679, #4c82b8, #073679);
+  border-radius: 8px;
+  animation: dock-bar-indeterminate 1.6s ease-in-out infinite;
+}
+
+/* === DATA SORTER EMBEDDED STYLES (restored core) === */
+.ds-container { 
+    max-width:1380px; margin:auto; background:var(--panel); border:1px solid var(--border); 
+    padding:20px 24px; border-radius:var(--radius); box-shadow:var(--elevation); position:relative; overflow:hidden; 
+    font-family: var(--theme-font);
+}
+.ds-form-label { display:block; font-weight:700; font-size:.78rem; letter-spacing:.45px; text-transform:uppercase; margin:.85rem 0 .3rem; color:var(--text-soft); }
+.ds-input, .ds-select, .ds-textarea { width:100%; background:var(--panel); border:1px solid var(--border); color:var(--text); border-radius:var(--radius-sm); padding:.6rem .7rem; font-size:.93rem; transition:.17s; font-family:inherit;}
+.ds-textarea { min-height:120px; resize:vertical; }
+.ds-input:focus, .ds-select:focus, .ds-textarea:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 6px var(--accent-glow);}
+.ds-group-box { background:var(--panel-alt); border:1px solid var(--border); padding:1rem 1rem 1.15rem; border-radius:var(--radius-sm); position:relative; box-shadow:0 4px 18px -10px rgba(7,54,121,0.04); margin-top:1rem; }
+.ds-group-box em { font-style:normal; font-size:.78rem; color:var(--text-soft); letter-spacing:.4px; }
+
+.ds-checkbox-group { 
+  display:flex; flex-wrap:wrap; gap:.55rem .7rem; margin-top:.55rem; 
+  min-height: 64px; padding: 8px; border: 2px dashed #dce2e8; 
+  border-radius: var(--radius-sm); background-color: #fafbfc;
+  transition: all 0.2s ease; position: relative;
+}
+.ds-checkbox-group.clean-buttons { border: none; background-color: transparent; padding: 0; min-height: auto; }
+.ds-checkbox-group.clean-buttons label {
+    cursor: pointer; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 20px; padding: 0.5rem 1rem; font-weight: 600;
+}
+.ds-checkbox-group.clean-buttons label:hover { border-color: var(--accent); color: var(--accent); }
+.ds-checkbox-group:not(.clean-buttons):empty::before {
+  content: 'Drop items here'; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); color: var(--text-soft); font-size: 0.8rem; opacity: 0.6; pointer-events: none;
+}
+.ds-checkbox-group.drop-target-active { background-color: rgba(7, 54, 121, 0.02); border-color: var(--border-strong); }
+.ds-checkbox-group.drop-hover {
+  background-color: rgba(109, 234, 249, 0.1); border-color: var(--robins-egg);
+  border-style: solid; box-shadow: 0 0 0 4px rgba(109, 234, 249, 0.15);
+}
+.ds-checkbox-group label { display:inline-flex; align-items:center; gap:.5rem; background:var(--panel); border:1px solid var(--border);
+  padding:.35rem .65rem; border-radius:999px; font-size:.93rem; font-weight:600; letter-spacing:.25px; cursor:grab; transition:.12s; color:var(--text);
+  touch-action: none; -webkit-tap-highlight-color: rgba(0,0,0,0); user-select:none; }
+.ds-checkbox-group label:active { cursor: grabbing; }
+.ds-checkbox-group label.dragging { opacity: 0.5; transform: scale(0.95); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.ds-checkbox-group label:hover { transform:translateY(-2px); box-shadow:0 6px 18px -12px rgba(7,54,121,0.06); }
+.ds-checkbox-group label .count-bubble { display:inline-block; min-width:20px; height:20px; line-height:20px; padding:0 6px; border-radius:999px; background:#eef6ff; color:var(--accent-2); border:1px solid var(--chip-border); font-size:0.78rem; font-weight:700; margin-left:6px; }
+.ds-checkbox-group label.selected { background:linear-gradient(180deg,#e6f0ff,#eef6ff); border-color:var(--accent); color:var(--accent-2); box-shadow:0 8px 20px -12px rgba(7,54,121,0.12); }
+.ds-checkbox-group label.selected .count-bubble { background:var(--accent); color:#fff; border-color:var(--accent-2); }
+.ds-checkbox-group label input[type="checkbox"] { position:absolute; opacity:0; width:0; height:0; margin:0; pointer-events:none; }
+
+.ds-badge { background:var(--badge); padding:4px 8px; border-radius:6px; font-size:.66rem; font-weight:700; color:#fff; letter-spacing:.5px;}
+.ds-btn { background:linear-gradient(180deg,var(--accent-2),var(--accent)); border:none; color:#fff; font-weight:700;
+  font-size:.92rem; letter-spacing:.3px; padding:.65rem 1.1rem; border-radius:10px; cursor:pointer; box-shadow:0 8px 20px -8px rgba(7,54,121,.18); transition:.15s; font-family:var(--theme-font); }
+.ds-btn:hover { transform:translateY(-2px); box-shadow:0 12px 30px -8px rgba(76,130,184,.18); }
+.ds-btn-small { padding:.42rem .8rem; font-size:.82rem; border-radius:8px; background:var(--panel); border:1px solid var(--border); color:var(--accent); cursor:pointer; font-family:var(--theme-font); }
+.ds-btn-small:hover { background:#f6fbff; border-color:var(--accent); color:var(--accent-2); }
+.ds-inline-add { display:flex; gap:.6rem; margin-top:.65rem; }
+.ds-inline-add input { flex:1; font-family:inherit; }
+.ds-chip-wrap { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:.55rem;}
+.ds-chip { background:var(--chip-bg); border:1px solid var(--chip-border); padding:.36rem .75rem; font-size:.86rem; letter-spacing:.0px; border-radius:999px; display:flex; align-items:center; gap:.6rem; font-weight:700; color:var(--text); font-family:var(--theme-font);}
+.ds-chip button { background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.95rem; padding:0; line-height:1; transition:.12s; }
+.ds-chip button:hover { color:var(--accent-2); }
+
+.ds-progress-wrapper { margin-top:1rem; }
+.ds-progress-wrapper.hidden { display:none; }
+.ds-progress-bar-bg { width:100%; height:11px; border-radius:8px; background:#eef6fb; overflow:hidden; box-shadow:inset 0 0 0 1px #e1eefb;}
+.ds-progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--robins-egg),var(--cool-blue)); transition:width .35s ease; }
+.ds-export-bar-fill { background:linear-gradient(90deg,#16a34a,#0d9488)!important; }
+.ds-eta-text { font-size:.79rem; text-transform:uppercase; letter-spacing:1px; margin-top:.4rem; font-weight:700; color:var(--accent); font-family:var(--theme-font); }
+
+.ds-table { width:100%; border-collapse:collapse; margin-top:1.8rem; font-size:.9rem; background:var(--panel-alt); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.ds-th, .ds-td { padding:.7rem .8rem; border-bottom:1px solid #eaf2f8; text-align:left; color:var(--text); font-family:var(--theme-font); }
+.ds-th { font-size:.78rem; letter-spacing:.8px; font-weight:700; text-transform:uppercase; background:#f3f8fd; color:var(--text-soft); }
+.ds-section-grid { display:flex; flex-wrap:wrap; gap:1.1rem; }
+.ds-section-half { flex:1 1 380px; min-width:320px; }
+
+.ds-rendering-analysis {
+  margin-top:12px; font-size:1.18rem; font-weight:800; color: var(--accent);
+  background: #f3f8fd; padding:12px 14px; border-radius:10px; border:1px solid var(--border);
+  display:none; font-family:var(--theme-font);
+}
+.ds-filter-badge {
+    display: inline-flex; align-items: center; background: #eef6ff;
+    border: 1px solid #b7c6d6; border-radius: 6px; padding: 2px 8px;
+    margin-bottom: 8px; font-size: 0.8rem; color: var(--accent); gap: 6px;
+}
+.ds-filter-badge .remove-filter { cursor: pointer; font-weight: bold; color: #b00020; }
+
+/* =========================
+   RESTORED ORIGINAL REBATE & APPEAL BUTTON STYLES
+   These mirror the original design used by the app:
+   - Neutral "view" button
+   - Accept (green) button
+   - Rebate (red) button
+   Also include modal/backdrop styles for rebate/appeal flows.
+   ========================= */
+
+/* Review action buttons (original style restored) */
+.review-action-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    cursor: pointer;
+    color: #374151;
+    display: inline-block;
+    margin-right: 6px;
+    font-weight: 700;
+    transition: background .12s ease, transform .08s ease, box-shadow .12s ease;
+    box-shadow: 0 2px 6px rgba(3, 7, 18, 0.04);
+}
+.review-action-btn:hover {
+    background: #f3f4f6;
+    transform: translateY(-1px);
+}
+
+/* View (neutral info) */
+.review-action-btn.view {
+    color: var(--cool-blue);
+    border-color: rgba(76,130,184,0.12);
+    background: #ffffff;
+}
+.review-action-btn.view:hover {
+    background: rgba(76,130,184,0.04);
+}
+
+/* Accept (green) */
+.review-action-btn.accept {
+    color: #065f46;
+    border-color: rgba(16,185,129,0.14);
+    background: #ecfdf5;
+}
+.review-action-btn.accept:hover {
+    background: #dcfce7;
+    box-shadow: 0 6px 16px rgba(16,185,129,0.08);
+}
+
+/* Rebate/Delete (red) */
+.review-action-btn.rebate {
+    color: #7f1d1d;
+    border-color: rgba(239,68,68,0.12);
+    background: #fff1f2;
+}
+.review-action-btn.rebate:hover {
+    background: #fee2e2;
+    box-shadow: 0 6px 16px rgba(239,68,68,0.06);
+}
+
+/* Disabled rebate style (kept subtle) */
+.review-action-btn.rebate[disabled],
+.review-action-btn.rebate.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Rebate / Appeal modal and backdrop (restored) */
+.rebate-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(34,37,41,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+}
+.rebate-modal {
+    background: #ffffff;
+    width: min(620px, 94%);
+    border-radius: 12px;
+    box-shadow: 0 18px 60px -18px rgba(34,37,41,0.4);
+    padding: 20px 22px;
+    color: #0f1724;
+    font-family: "Roboto Condensed", sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.rebate-modal h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: .3px;
+    color: #0f1724;
+}
+.rebate-modal .modal-body {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.45;
+}
+.rebate-modal .modal-actions {
+    display:flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+.rebate-modal .btn-primary {
+    background: linear-gradient(180deg,#ef4444,#dc2626);
+    color: #fff;
+    border: 1px solid rgba(220,38,38,0.12);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 800;
+}
+.rebate-modal .btn-secondary {
+    background: #ffffff;
+    color: #0f1724;
+    border: 1px solid #d1d5db;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+/* Appeal modal specifics (keeps similar structure but different emphasis) */
+.appeal-modal-backdrop { /* reuse backdrop style */ }
+.appeal-modal {
+    background: #ffffff;
+    width: min(620px, 94%);
+    border-radius: 12px;
+    box-shadow: 0 18px 60px -18px rgba(34,37,41,0.4);
+    padding: 20px 22px;
+    color: #0f1724;
+    font-family: "Roboto Condensed", sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.appeal-modal textarea {
+    width:100%;
+    min-height: 120px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e6eef8;
+    font-family: inherit;
+    font-size: 13px;
+}
+.appeal-modal .modal-actions {
+    display:flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+.appeal-modal .btn-submit {
+    background: linear-gradient(180deg,var(--cool-blue),var(--azure-dragon));
+    color: #fff;
+    border: 1px solid rgba(7,54,121,0.12);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 800;
+}
+
+/* Accessibility: focus states for modal buttons */
+.rebate-modal .btn-primary:focus,
+.rebate-modal .btn-secondary:focus,
+.appeal-modal .btn-submit:focus {
+    outline: 3px solid rgba(14,165,233,0.18);
+    outline-offset: 2px;
+}
+
+/* End rebate & appeal block */
+
+/* End of file */
+
+/* ---------------------------------------------------------------------------
+   FINAL PATCH:
+   - Standardise the "image 1" toolbar button (Download Excel / #exportExcelBtn).
+   - Apply image 2 Accept Selected / Rebate Selected color & design to the review buttons
+     (#acceptSelectedBtn and #rebateSelectedBtn).
+   - Keep changes narrowly scoped to avoid affecting other controls.
+   --------------------------------------------------------------------------- */
+
+/* Standardize the Download Excel button color (image 1 button).
+   Use the main primary blue but more consistent tone across the toolbar.
+*/
+#toolbar #exportExcelBtn {
+  background: linear-gradient(180deg, var(--primary-700), var(--primary-500)) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(20,61,140,0.12) !important;
+  box-shadow: 0 8px 22px rgba(20,61,140,0.12) !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  transition: transform .08s ease, box-shadow .12s ease !important;
+}
+#toolbar #exportExcelBtn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 32px rgba(20,61,140,0.16) !important;
+}
+
+/* Accept Selected and Rebate Selected should use image 2 button color & design.
+   Target the buttons used in the Assessment Review toolbar.
+   Keep the pill shape, soft background tint, subtle border, and colored text.
+*/
+
+/* Accept Selected — soft mint/green (image 2 style) */
+#acceptSelectedBtn,
+#toolbar-review #acceptSelectedBtn,
+#tab-assessment-review #acceptSelectedBtn {
+  background: linear-gradient(180deg, #e6fbef, #def7ea) !important; /* very light mint */
+  color: #0f855a !important; /* stronger green text similar to image */
+  border: 1px solid rgba(16,137,107,0.12) !important;
+  box-shadow: 0 6px 16px rgba(16,137,107,0.06) !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  font-weight: 800 !important;
+  min-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Add optional small check icon style if markup includes an .icon element */
+#acceptSelectedBtn .icon,
+#toolbar-review #acceptSelectedBtn .icon,
+#tab-assessment-review #acceptSelectedBtn .icon {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:20px; height:20px;
+  border-radius:6px;
+  background: rgba(16,137,107,0.08);
+  color: #0f855a;
+  font-weight:800;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.6);
+}
+
+/* Rebate Selected — soft coral/pink (image 2 style) */
+#rebateSelectedBtn,
+#toolbar-review #rebateSelectedBtn,
+#tab-assessment-review #rebateSelectedBtn {
+  background: linear-gradient(180deg, #fff1f1, #ffecec) !important; /* very light coral/pink */
+  color: #b43b3b !important; /* warmer red/pink text similar to image */
+  border: 1px solid rgba(204,80,80,0.10) !important;
+  box-shadow: 0 6px 16px rgba(204,80,80,0.05) !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  font-weight: 800 !important;
+  min-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Add optional small X icon style if markup includes an .icon element */
+#rebateSelectedBtn .icon,
+#toolbar-review #rebateSelectedBtn .icon,
+#tab-assessment-review #rebateSelectedBtn .icon {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:20px; height:20px;
+  border-radius:6px;
+  background: rgba(180,59,59,0.06);
+  color: #b43b3b;
+  font-weight:800;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.6);
+}
+
+/* Hover states for Accept / Rebate buttons */
+#acceptSelectedBtn:hover,
+#toolbar-review #acceptSelectedBtn:hover,
+#tab-assessment-review #acceptSelectedBtn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 28px rgba(16,137,107,0.12) !important;
+}
+
+#rebateSelectedBtn:hover,
+#toolbar-review #rebateSelectedBtn:hover,
+#tab-assessment-review #rebateSelectedBtn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 28px rgba(180,59,59,0.10) !important;
+}
+
+/* Disabled state uses reduced opacity and removes lift */
+#acceptSelectedBtn:disabled,
+#rebateSelectedBtn:disabled,
+#toolbar-review #acceptSelectedBtn:disabled,
+#toolbar-review #rebateSelectedBtn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Narrow scope: ensure these overrides do not impact other review action buttons */
+.review-action-btn.accept,
+.review-action-btn.rebate {
+  /* keep earlier styles; specific IDs above override where used */
+}
+
+/* ---------------------------------------------------------------------------
+   End of final patch. Only the selectors above were changed to meet the
+   requested visual standardization:
+   - #exportExcelBtn (image 1 button standardized to main primary blue)
+   - #acceptSelectedBtn and #rebateSelectedBtn (image 2 styles applied)
+   --------------------------------------------------------------------------- */
+
+
+/* =========================
+   APP.JS COMPATIBILITY HELPERS
+   (Restores a small set of utility classes App.js expects)
+   ========================= */
+
+.app-card {
+  background: var(--card);
+  border: 1px solid var(--neutral-border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  color: var(--muted);
+}
+
+/* Buttons used through the app */
+.btn-primary {
+  background: linear-gradient(180deg, var(--azure-dragon), var(--cool-blue));
+  border: 1px solid var(--accent-border);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(7,54,121,0.12);
+}
+.btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-calculate {
+  margin-left: 12px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.btn-secondary {
+  background: #fff;
+  border: 1px solid var(--cool-blue);
+  color: var(--azure-dragon);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-card); /* Desired Dawn #ebebeb - FIOE brand neutral hover */
+  border-color: var(--azure-dragon);
+}
+.btn-secondary:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Reusable modal header strip - Azure Dragon to Cool Blue gradient (FIOE brand) */
+.fioe-modal-header {
+  background: linear-gradient(135deg, var(--azure-dragon), var(--cool-blue));
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.btn-danger {
+  background: linear-gradient(180deg, var(--danger), var(--danger-border));
+  border: 1px solid rgba(217,48,37,0.15);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Resume Tab – Email Verification Service Bar — collapsible vskillset style
+   Palette mirrors the nav sidebar: Black Beauty · Azure Dragon · Cool Blue · Robin's Egg · Argent */
+.email-verif-bar {
+  background: #222529;
+  border-radius: 6px;
+  border: 1px solid rgba(109,234,249,0.12);
+  overflow: hidden;
+  width: 31%;
+  transition: border-color 0.18s ease;
+}
+.email-verif-bar:hover,
+.email-verif-bar:focus-within {
+  border-color: rgba(109,234,249,0.30);
+}
+.email-verif-bar__toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+.email-verif-bar__toggle:hover {
+  background: rgba(255,255,255,0.05);
+}
+.email-verif-bar__icon {
+  color: #4c82b8;
+  flex-shrink: 0;
+}
+.email-verif-bar__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #87888a;
+  flex: 1;
+  font-family: "Roboto Condensed", Inter, sans-serif;
+  letter-spacing: 0.3px;
+  transition: color 0.15s ease;
+}
+.email-verif-bar__toggle:hover .email-verif-bar__label {
+  color: #d8d8d8;
+}
+.email-verif-bar__active-hint {
+  color: #6deaf9;
+  font-weight: 700;
+}
+.email-verif-bar__arrow {
+  font-size: 9px;
+  color: #4c82b8;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+.email-verif-bar__toggle:hover .email-verif-bar__arrow {
+  color: #6deaf9;
+}
+.email-verif-bar__body {
+  padding: 0 10px 8px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  margin-top: 0;
+}
+.email-verif-bar__select {
+  width: 100%;
+  font-size: 12px;
+  padding: 4px 8px;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: #073679;
+  color: #d8d8d8;
+  border: 1px solid rgba(76,130,184,0.35);
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.email-verif-bar__select:focus,
+.email-verif-bar__select:hover {
+  border-color: #6deaf9;
+  color: #fff;
+}
+.email-verif-bar__select option {
+  background: #222529;
+  color: #d8d8d8;
+}
+
+/* Resume Tab - Skillset containers */
+.skillset-container {
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 2px dashed #d1d5db;
+  min-height: 80px;
+  line-height: 1.6;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.skillset-header {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+/* Small utility classes */
+.skill-bubble {
+  display: inline-block;
+  padding: 6px 14px;
+  margin: 0;
+  border-radius: 20px;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  font-size: 13px;
+  color: #166534;
+  font-weight: 500;
+  cursor: grab;
+  position: relative;
+}
+
+/* Only add extra padding when remove button is present (via parent selector) */
+.skillset-container .skill-bubble {
+  padding-right: 32px; /* Extra space for remove button */
+}
+
+.skill-bubble.unmatched {
+  padding: 6px 14px; /* No remove button on unmatched skills */
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.skill-bubble .remove-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #166534;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.skill-bubble.unmatched .remove-btn {
+  color: #991b1b;
+}
+
+/* Verified Skillset table */
+.vskillset-section {
+  margin-bottom: 24px;
+}
+
+.vskillset-header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--neutral-border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.vskillset-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--black-beauty);
+}
+
+.vskillset-arrow {
+  color: var(--argent);
+  font-size: 12px;
+}
+
+.vskillset-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  background: #ffffff;
+  border: 1px solid var(--neutral-border);
+  border-radius: 6px;
+}
+
+.vskillset-table thead {
+  background: var(--bg-card);
+}
+
+.vskillset-table th {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 2px solid var(--neutral-border);
+  font-weight: 600;
+  color: var(--black-beauty);
+}
+
+.vskillset-table td {
+  padding: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.vskillset-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Candidate Assessment table */
+.assessment-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.assessment-table thead {
+  background: var(--cool-blue);
+  color: white;
+}
+
+.assessment-table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.assessment-table td {
+  padding: 12px 16px;
+}
+
+.assessment-table tbody tr:nth-child(odd) {
+  background: #f9fafb;
+}
+
+.assessment-table tbody tr:nth-child(even) {
+  background: #ffffff;
+}
+
+.assessment-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.assessment-badge {
+  background: var(--cool-blue);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+/* Table sticky/checkbox cells fallback (keeps layout stable) */
+.table-sticky-checkbox {
+  width: 44px;
+  min-width: 44px;
+  text-align: center;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: #fff;
+}
+
+/* Org chart node basic styling (keeps nodes readable) */
+.org-box {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-width: 180px;
+  max-width: 240px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(7,54,121,0.06);
+  border: 1px solid #e6eef8;
+  font-weight: 700;
+  color: #0f1724;
+  position: relative;
+  display: inline-block;
+}
+.org-box-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, var(--robins-egg), var(--cool-blue));
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+.org-name { font-size: 14px; color: var(--black-beauty); margin-bottom: 6px; font-weight:800; }
+.org-title { font-size: 12px; color: #475569; }
+.org-meta { font-size: 11px; color: #64748b; margin-top: 8px; }
+
+/* Inline short label used as badges in org nodes */
+.org-inline-label {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(7,54,121,0.06);
+  color: var(--azure-dragon);
+  font-weight: 800;
+  font-size: 11px;
+}
+
+/* Modal compatibility — ensure modals sit above everything else */
+.app-card[role="dialog"], .app-modal {
+  z-index: 11000;
+  position: relative;
+}
+
+/* Form controls (makes mailer modal inputs look correct) */
+input[type="text"], input[type="email"], input[type="password"], textarea, select {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  border: 1px solid var(--desired-dawn);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--muted);
+  box-sizing: border-box;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--cool-blue);
+  box-shadow: 0 0 0 6px rgba(76,130,184,0.08);
+}
+
+/* Dotted file-drop area used by attachments (keeps original look) */
+.file-drop-compat {
+  border: 2px dashed var(--desired-dawn);
+  background: #f8fafc;
+  padding: 18px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* minimal reset for table inputs to avoid heavy black borders */
+table input[type="text"], table select {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 6px 8px;
+}
+
+/* small responsive tweaks */
+@media (max-width: 720px) {
+  .org-box { min-width: 140px; padding: 8px; }
+  .app-card { padding: 12px; }
+  .btn-primary, .btn-secondary, .btn-danger { padding: 8px 10px; }
+}
+
+/* End of compatibility block */
+/* ── Candidate table (App.js) ── */
+.candidates-grid-wrap {
+  background: #fff;
+}
+
+/* Row hover — !important needed to override the per-row inline background style */
+.candidates-grid tbody tr:hover td {
+  background: rgba(109,234,249,0.10) !important;
+  transition: background 0.1s ease;
+}
+
+/* Avatar circle inside name cell */
+.candidate-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+/* ── App.js main nav tabs ── */
+.tab-active {
+  background: var(--azure-dragon);
+  color: #fff;
+  border: 1px solid var(--azure-dragon);
+  box-shadow: 0 4px 12px rgba(7,54,121,0.25);
+}
+.tab-active:hover { background: var(--cool-blue); border-color: var(--cool-blue); }
+
+.tab-inactive {
+  background: var(--bg-card);
+  color: var(--cool-blue);
+  border: 1px solid var(--neutral-border);
+}
+.tab-inactive:hover {
+  background: rgba(109,234,249,0.12);
+  border-color: var(--cool-blue);
+  color: var(--azure-dragon);
+}

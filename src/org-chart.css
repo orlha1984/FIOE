@@ -1,0 +1,300 @@
+:root{
+  --oc-line: #6b7280;    /* connector color */
+  --oc-thick: 2px;       /* connector thickness */
+  --oc-gap: 34px;        /* vertical gap down to the child row */
+  --oc-hpad: 22px;       /* side padding per child */
+
+  --oc-card-bg: #ffffff;
+  --oc-card-border: #d7dee9;
+  --oc-card-shadow: 0 4px 14px rgba(2,6,23,0.06);
+  --oc-card-shadow-hover: 0 10px 24px rgba(2,6,23,0.10);
+  --oc-name: #0f172a;
+  --oc-title: #475569;
+}
+
+/* Frame */
+.org-group { border: 1px solid #e5e7eb; border-radius: 8px; margin: 12px 0; background: #fff; }
+.org-header { padding: 8px 12px; font-weight: 600; border-bottom: 1px solid #e5e7eb; background: #f9fafb; }
+.org-tree-root { margin: 12px 0; display: inline-block; vertical-align: top; }
+
+/* Rows: use a CSS variable for dynamic sibling gap that JS sets per row */
+.org {
+  position: relative;
+  padding-top: 0;
+  display: inline-flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--sibling-gap, 24px);
+  white-space: nowrap;
+}
+
+/* Child cell */
+.org li {
+  list-style-type: none;
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  padding: var(--oc-gap) var(--oc-hpad) 0 var(--oc-hpad);
+  text-align: center;
+  white-space: normal;
+  /* ensure connectors (pseudo elements) are not clipped by the li itself */
+  overflow: visible;
+}
+
+/* Robust connectors: half-branches + centered vertical stub */
+.org li::before,
+.org li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: var(--oc-gap);
+  border-top: var(--oc-thick) solid var(--oc-line);
+  /* place connectors behind the cards */
+  z-index: 0;
+}
+.org li::before { right: 50%; }
+.org li::after  { left: 50%; border-left: var(--oc-thick) solid var(--oc-line); }
+
+/* Cleanup endings and single-child case */
+.org li:first-child::before { border-top: none; }
+.org li:last-child::after   { border-top: none; }
+.org li:only-child { padding-top: var(--oc-gap); }
+.org li:only-child::before { border-top: none; }
+.org li:only-child::after  { border-top: none; border-left: none; }
+
+/* Vertical from parent box to the child row branch */
+.org ul { padding-top: 0; position: relative; overflow: visible; }
+.org ul::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: var(--oc-gap);
+  border-left: var(--oc-thick) solid var(--oc-line);
+  z-index: 0;
+}
+
+/* Card
+   NOTE: increased card width and allowed max-width so bubbles have room.
+   Cards keep a sensible min-width for layout stability.
+   Adjusted bottom padding so the badge can sit aligned with the meta row.
+*/
+.org-box {
+  display: inline-block;
+  /* increased default width to give badges more room; still constrained */
+  width: 200px;
+  min-width: 168px;
+  max-width: 280px;
+  box-sizing: border-box;
+  background: var(--oc-card-bg);
+  border: 1px solid var(--oc-card-border);
+  border-radius: 10px;
+  /* top/right/bottom/left: increase bottom padding so inline badge won't overlap card boundary */
+  padding: 12px 18px 20px 18px;
+  box-shadow: var(--oc-card-shadow);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  z-index: 2; /* above lines */
+  transition: transform .18s ease, box-shadow .18s ease;
+  /* keep badges inside the card bounds per request */
+  overflow: visible; /* connectors need visible, badge will be constrained inside via positioning */
+}
+.org-box:hover { transform: translateY(-3px); box-shadow: var(--oc-card-shadow-hover); }
+
+.org-box-accent { position: absolute; left: 0; right: 0; top: 0; height: 6px; border-radius: 10px 10px 0 0; background: #94a3b8; }
+.org-name { font-weight: 800; color: var(--oc-name); font-size: 14px; line-height: 1.25; }
+
+/* Title area: keep it centered and allow multi-line titles */
+.org-title {
+  font-weight: 600;
+  color: #475569;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  text-align: center;
+  white-space: normal;
+}
+
+/* Meta row (country • geographic) - centered, and reserve a bit of right space so the badge can sit next to it */
+.org-meta {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 6px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  line-height: 1.2;
+  /* reserve space on the right so the badge doesn't overlap the meta text */
+  padding-right: 56px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Inline labels (bubble)
+   We position the bubble to visually sit beside the meta row (to the right of "Asia").
+   Use absolute positioning anchored to the right side of the card but vertically aligned to the meta row's center.
+   This avoids placing the bubble over the title and keeps it visually adjacent to the country/geographic text.
+*/
+.org-inline-label {
+  font-size: 11px;
+  line-height: 1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+  box-shadow: 0 1px 0 rgba(16,24,40,0.03);
+
+  /* constrain size inside card */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* place visually beside the meta row:
+     - positioned absolutely relative to the card (.org-box)
+     - horizontally anchored right: 12px
+     - vertically placed using top offset computed from card content so it's aligned to the meta row center
+       we compute a safe default top using calc() that works across common card heights.
+  */
+  position: absolute;
+  right: 13px;
+
+  /* The top value chosen empirically to sit at the vertical center of the meta row for the current
+     card padding/line-height. Adjust if your font sizes/paddings change. */
+  top: calc(50% + 23px);
+  transform: translateY(-50%);
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+/* Aliases: support older short classes and new full-word classes */
+.org-inline-label.label-jr,
+.org-inline-label.label-junior {
+  background: #dbeafe;
+  color: #1e3a8a;
+  border-color: #bfdbfe;
+}
+
+.org-inline-label.label-mid {
+  background: #ecfccb;
+  color: #365314;
+  border-color: #d9f99d;
+}
+
+/* Senior: accept both label-sr and label-senior */
+.org-inline-label.label-sr,
+.org-inline-label.label-senior {
+  background: #ffe4e6;
+  color: #9f1239;
+  border-color: #fecdd3;
+}
+
+/* Expert */
+.org-inline-label.label-expert {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+/* Lead */
+.org-inline-label.label-lead {
+  background: #e8f0ff; /* pale blue */
+  color: #26486b;
+  border-color: #cfe0ff;
+}
+
+/* Manager (Mgr) */
+.org-inline-label.label-mgr {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+
+/* Director (Dir) */
+.org-inline-label.label-dir {
+  background: #fff3e8;
+  color: #7a4d00;
+  border-color: #ffe4c7;
+}
+
+/* Executive (Exec) */
+.org-inline-label.label-exec {
+  background: #fdecef;
+  color: #7b2b3a;
+  border-color: #f9ced6;
+}
+
+/* Small-screen / print adjustments:
+   keep badges readable and move them inline with meta on very narrow screens */
+.org-box .org-inline-label {
+  max-width: calc(100% - 36px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 420px) {
+  .org-box { width: 160px; padding: 10px 12px 16px 12px; }
+  .org-title { padding: 0; }
+  .org-meta { padding-right: 12px; }
+  .org-inline-label {
+    position: static;
+    display: inline-block;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin-left: 8px;
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}
+
+/* Two-column cascades */
+.two-col-tier {
+  display: grid !important;
+  grid-template-columns: repeat(2, max-content);
+  column-gap: 24px;
+  row-gap: 24px;
+  justify-content: center;
+  position: relative;
+}
+
+/* Export/high contrast */
+.org-export .org-box { background: #ffffff !important; border-color: #000000 !important; }
+.org-export .org-name, .org-export .org-title { color: #000000 !important; }
+.org-export .org-chart-canvas, .org-export .org-tree { overflow: visible !important; }
+
+/* ---------------------------
+   Connector clipping fixes (reinforced)
+   --------------------------- */
+
+/* ensure the scroll wrapper allows vertical connector visibility without hiding lines */
+.org-chart-scroll {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  padding-bottom: 10px;
+}
+.org-center-wrapper { overflow: visible; }
+.org-group, .org-tree-root { overflow: visible; }
+
+/* make connector lines slightly longer so small rounding/truncation doesn't visually cut them */
+.org li::before,
+.org li::after,
+.org ul::before {
+  height: calc(var(--oc-gap) + 6px);
+  z-index: 0;
+}
+
+/* allow a tiny negative margin so the branch meets the node border cleanly */
+.org ul { margin-top: -6px; }

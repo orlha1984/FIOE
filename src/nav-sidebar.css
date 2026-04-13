@@ -1,0 +1,290 @@
+/* ============================================================
+   Left-Column Navigation Sidebar  –  Seekout-inspired design
+   Palette:
+     Black Beauty   #222529   sidebar background
+     Azure Dragon   #073679   active submenu bg
+     Cool Blue      #4c82b8   chevron / mild accents
+     Robin's Egg    #6deaf9   active text accent
+     Desired Dawn   #d8d8d8   hover text
+     Argent         #87888a   idle text / sub-items
+   ============================================================ */
+
+/* Reset body margin/padding so the sidebar flush-fills the viewport */
+body:has(.page-shell) {
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Page shell ── */
+.page-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.nav-sidebar {
+  width: 180px;
+  min-width: 180px;
+  background: #222529;           /* black-beauty */
+  color: #d8d8d8;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 200;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+
+/* ── Brand strip ── */
+.nav-sidebar__brand {
+  display: flex;
+  align-items: center;
+  padding: 14px 12px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  white-space: nowrap;
+}
+
+/* FIOE logo image */
+.nav-sidebar__logo {
+  width: 30px;
+  height: auto;
+  display: block;
+}
+
+/* Small right-arrow suffix like "seekout ›" */
+.nav-sidebar__brand::after {
+  content: "›";
+  color: #6deaf9;                /* robins-egg */
+  font-size: 16px;
+  line-height: 1;
+  margin-left: 4px;
+}
+
+/* ── Nav list ── */
+.nav-sidebar__list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  flex: 1;
+}
+
+/* Individual item */
+.nav-sidebar__item {
+  position: relative;
+}
+
+/* ── Top-level link / trigger ── */
+.nav-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 16px;
+  color: #87888a;                /* argent */
+  text-decoration: none;
+  font-family: "Roboto Condensed", "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s ease, color 0.12s ease;
+  box-sizing: border-box;
+  border-radius: 0;
+}
+
+.nav-sidebar__link:hover,
+.nav-sidebar__link:focus-visible {
+  background: rgba(255,255,255,0.05);
+  color: #d8d8d8;                /* desired-dawn */
+  outline: none;
+}
+
+/* Active top-level item */
+.nav-sidebar__link.active {
+  background: rgba(109,234,249,0.10);  /* robins-egg tint */
+  color: #6deaf9;                       /* robins-egg */
+  font-weight: 600;
+}
+
+/* ── SVG icon ── */
+.nav-sidebar__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* ── Services dropdown ── */
+.nav-sidebar__item--has-sub .nav-sidebar__submenu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  background: rgba(7,54,121,0.25);   /* azure-dragon tint */
+  transition: max-height 0.28s ease;
+}
+
+/* Expand on hover or keyboard focus */
+.nav-sidebar__item--has-sub:hover .nav-sidebar__submenu,
+.nav-sidebar__item--has-sub:focus-within .nav-sidebar__submenu {
+  max-height: 300px;
+}
+
+/* Sub-link */
+.nav-sidebar__submenu-link {
+  display: block;
+  padding: 8px 16px 8px 40px;
+  color: #87888a;                  /* argent */
+  text-decoration: none;
+  font-family: "Roboto Condensed", "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  transition: background 0.15s ease, color 0.12s ease;
+  box-sizing: border-box;
+}
+
+.nav-sidebar__submenu-link:hover,
+.nav-sidebar__submenu-link:focus-visible {
+  background: rgba(255,255,255,0.05);
+  color: #d8d8d8;
+  outline: none;
+}
+
+.nav-sidebar__submenu-link.active {
+  color: #6deaf9;                   /* robins-egg */
+  font-weight: 600;
+}
+
+/* ── Chevron SVG ── */
+.nav-sidebar__chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #4c82b8;                   /* cool-blue */
+  transition: transform 0.2s ease;
+}
+
+.nav-sidebar__item--has-sub:hover .nav-sidebar__chevron,
+.nav-sidebar__item--has-sub:focus-within .nav-sidebar__chevron {
+  transform: rotate(90deg);
+  color: #6deaf9;
+}
+
+/* ── Staff Login inline panel ── */
+.nav-sidebar__login-panel {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.28s ease;
+  background: rgba(7,54,121,0.20);
+}
+
+.nav-sidebar__login-panel.open {
+  max-height: 220px;
+}
+
+.nav-sidebar__login-inner {
+  padding: 10px 14px 12px;
+}
+
+.nav-sidebar__login-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  color: #d8d8d8;
+  font-size: 12px;
+  padding: 6px 8px;
+  margin-bottom: 7px;
+  outline: none;
+}
+
+.nav-sidebar__login-input:focus {
+  border-color: #6deaf9;
+}
+
+.nav-sidebar__login-input::placeholder {
+  color: #87888a;
+}
+
+.nav-sidebar__login-btn {
+  width: 100%;
+  box-sizing: border-box;
+  background: #073679;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 2px;
+}
+
+.nav-sidebar__login-btn:hover {
+  background: #4c82b8;
+}
+
+.nav-sidebar__login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.nav-sidebar__login-error {
+  color: #ff6b6b;
+  font-size: 11px;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+/* ── Thin divider ── */
+.nav-sidebar__divider {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 6px 12px;
+}
+
+/* ── Main content area ── */
+.page-main {
+  flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Responsive: collapse to icon rail at ≤768 px ── */
+@media (max-width: 768px) {
+  .nav-sidebar {
+    width: 48px;
+    min-width: 48px;
+  }
+  .nav-sidebar__brand,
+  .nav-sidebar__link > span:not(.nav-sidebar__icon),
+  .nav-sidebar__link > svg:not(.nav-sidebar__icon),
+  .nav-sidebar__chevron,
+  .nav-sidebar__submenu {
+    display: none;
+  }
+  .nav-sidebar__link {
+    justify-content: center;
+    padding: 12px 0;
+  }
+  .nav-sidebar__link:hover,
+  .nav-sidebar__link:focus-visible {
+    padding-left: 0;
+  }
+  .nav-sidebar__icon {
+    width: 18px;
+    height: 18px;
+  }
+}
