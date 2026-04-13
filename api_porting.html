@@ -1,0 +1,2997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>API Porting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.ico">
+
+  <!-- Theme Fonts (matches AutoSourcing / SourcingVerify) -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Shared Styles -->
+  <link rel="stylesheet" href="sourcing_verify.css">
+  <!-- Left Column Navigation -->
+  <link rel="stylesheet" href="nav-sidebar.css">
+  <script src="nav-sidebar.js" defer></script>
+
+  <style>
+    /* ── Root overrides ── */
+    :root {
+      --azure-rgb: 7, 54, 121;
+    }
+    /* ── Page-level layout ── */
+    .page-main {
+      flex: 1;
+      min-width: 0;
+      overflow-y: auto;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-header {
+      background: var(--azure-dragon);
+      padding: 0 28px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(7,54,121,.4);
+    }
+    .page-header h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      font-family: "Orbitron", "Roboto Condensed", sans-serif;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-header h1 .header-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--robins-egg); flex-shrink: 0;
+      box-shadow: 0 0 6px var(--robins-egg);
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .page-header .header-admin {
+      color: rgba(255,255,255,.75);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: "Roboto Condensed", sans-serif;
+      padding: 5px 12px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 6px;
+      transition: color .15s, border-color .15s, background .15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .page-header .header-admin:hover {
+      color: #fff;
+      border-color: var(--robins-egg);
+      background: rgba(109,234,249,.12);
+    }
+
+    .page-content {
+      flex: 1;
+      padding: 24px 28px 40px;
+      width: 100%;
+      box-sizing: border-box;
+      max-width: 1080px;
+    }
+
+    /* ── Tabs ── */
+    .tabs-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+    .tab-btn {
+      padding: 10px 20px;
+      border: 1px solid transparent;
+      border-bottom: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--argent);
+      font-size: 13px;
+      font-family: "Roboto Condensed", "Inter", sans-serif;
+      letter-spacing: 0.3px;
+      border-radius: 8px 8px 0 0;
+      transition: background 0.15s, color 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .tab-btn:hover {
+      background: rgba(76,130,184,.08);
+      color: var(--cool-blue);
+    }
+    .tab-btn.active {
+      background: var(--panel);
+      border-color: var(--border);
+      border-bottom: 2px solid var(--panel);
+      color: var(--azure-dragon);
+      margin-bottom: -2px;
+      position: relative;
+    }
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 12px;
+      right: 12px;
+      height: 3px;
+      background: var(--azure-dragon);
+      border-radius: 2px 2px 0 0;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--cool-blue);
+      border-radius: 10px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      box-shadow: var(--elevation);
+    }
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--azure-dragon);
+      font-family: "Roboto Condensed", "Orbitron", sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card h2 .badge {
+      background: var(--robins-egg);
+      color: var(--azure-dragon);
+      font-size: 10px;
+      font-weight: 700;
+      font-family: "Roboto Condensed", sans-serif;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .card .subtitle {
+      color: var(--text-soft);
+      font-size: 13px;
+      margin: 0 0 22px;
+      line-height: 1.5;
+    }
+
+    /* Two-column layout for Port Data tab */
+    .port-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 800px) {
+      .port-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--cool-blue);
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--border), transparent);
+    }
+
+    /* ── Upload zone ── */
+    .upload-zone {
+      border: 2px dashed var(--cool-blue);
+      border-radius: 10px;
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(76,130,184,.04);
+      transition: border-color .2s, background .2s;
+      height: 100%;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+    }
+    .upload-zone::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(76,130,184,.03) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--robins-egg);
+      background: rgba(109,234,249,.08);
+    }
+    .upload-zone input[type=file] { display: none; }
+    .upload-zone .uz-icon { font-size: 36px; margin-bottom: 10px; }
+    .upload-zone .uz-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--azure-dragon);
+      font-family: "Roboto Condensed", sans-serif;
+    }
+    .upload-zone .uz-hint {
+      color: var(--text-soft);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .file-chosen {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--success-600);
+      font-weight: 700;
+      background: rgba(24,128,56,.07);
+      padding: 5px 12px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    /* ── Side-by-side Options A + B layout ── */
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0 20px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+    .upload-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .or-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .or-col::before, .or-col::after {
+      content: '';
+      flex: 1;
+      width: 1px;
+      background: var(--border);
+    }
+    .or-col span {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--argent);
+    }
+    @media (max-width: 760px) {
+      .upload-grid {
+        grid-template-columns: 1fr;
+      }
+      .or-col {
+        flex-direction: row;
+        margin: 8px 0;
+      }
+      .or-col::before, .or-col::after {
+        width: auto;
+        height: 1px;
+        flex: 1;
+      }
+    }
+
+    /* ── Inputs (extends sourcing_verify.css) ── */
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 10px 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-family: monospace;
+      background: var(--panel-alt);
+      color: var(--text);
+      resize: vertical;
+      line-height: 1.5;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-border);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    input[type=url] {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      background: var(--panel-alt);
+      color: var(--text);
+      font-family: "Roboto Condensed", sans-serif;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input[type=url]:focus {
+      outline: none;
+      border-color: var(--accent-border);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .field-hint {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin: 5px 0 0;
+    }
+
+    /* ── Buttons (extends sourcing_verify.css) ── */
+    .btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: "Roboto Condensed", "Inter", sans-serif;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: background .18s, box-shadow .18s, transform .1s;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary {
+      background: var(--azure-dragon);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(7,54,121,.22);
+    }
+    .btn-primary:hover {
+      background: var(--primary-700);
+      box-shadow: 0 4px 12px rgba(7,54,121,.32);
+    }
+    .btn-primary:disabled {
+      background: var(--argent);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    .btn-block { width: 100%; justify-content: center; margin-top: 16px; }
+
+    /* ── Mapping preview ── */
+    .mapping-preview {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--cool-blue);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-bottom: 18px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .no-mapping {
+      color: var(--text-soft);
+      font-style: italic;
+      font-family: "Roboto Condensed", "Inter", sans-serif;
+    }
+
+    /* ── Info strip ── */
+    .info-strip {
+      background: rgba(109,234,249,.08);
+      border: 1px solid rgba(109,234,249,.3);
+      border-left: 3px solid var(--robins-egg);
+      border-radius: var(--radius-sm);
+      padding: 11px 16px;
+      font-size: 13px;
+      color: var(--azure-dragon);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .info-strip .info-icon { flex-shrink: 0; }
+
+    /* ── Status messages ── */
+    .status-msg {
+      margin-top: 14px;
+      padding: 11px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      display: none;
+      font-weight: 500;
+      font-family: "Roboto Condensed", "Inter", sans-serif;
+    }
+    .status-msg.success {
+      background: rgba(24,128,56,.08);
+      color: var(--success-600);
+      border: 1px solid rgba(24,128,56,.22);
+      display: block;
+    }
+    .status-msg.error {
+      background: rgba(234,67,53,.07);
+      color: var(--danger);
+      border: 1px solid rgba(234,67,53,.2);
+      display: block;
+    }
+    .status-msg.warn {
+      background: rgba(178,95,0,.07);
+      color: #b25f00;
+      border: 1px solid rgba(178,95,0,.2);
+      display: block;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    code {
+      background: rgba(7,54,121,.07);
+      color: var(--azure-dragon);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: .91em;
+      font-family: monospace;
+    }
+
+    /* ── Pre-flight check panel ── */
+    .preflight-panel {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--cool-blue);
+      background: var(--panel-alt);
+      padding: 14px 16px;
+      margin-bottom: 4px;
+    }
+    .preflight-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .preflight-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--cool-blue);
+      font-family: "Roboto Condensed", sans-serif;
+    }
+    .preflight-recheck {
+      font-size: 11px;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--text-soft);
+    }
+    .preflight-rows { display: flex; flex-direction: column; gap: 6px; }
+    .preflight-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .preflight-icon {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+    .preflight-icon.pending {
+      background: var(--desired-dawn); color: var(--argent);
+      font-size: 9px; letter-spacing: .5px;
+    }
+    .preflight-icon.ok { background: #e6f4ea; color: #188038; }
+    .preflight-icon.warn { background: #fef7e0; color: #b06000; }
+    .preflight-icon.error { background: #fce8e6; color: #c5221f; }
+    .preflight-row-body { flex: 1; }
+    .preflight-row-label {
+      font-weight: 600;
+      color: var(--text);
+      font-family: "Roboto Condensed", sans-serif;
+    }
+    .preflight-row-detail {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-top: 2px;
+    }
+    .preflight-row-fix {
+      margin-top: 5px;
+    }
+    .preflight-row-fix a {
+      font-size: 11px;
+      color: var(--cool-blue);
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .preflight-row-fix a:hover { text-decoration: underline; }
+
+    /* ── Session banner (injected by JS) ── */
+    #sessionBanner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    /* ── Mode selection modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7,23,60,.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9000;
+      animation: fadeInOverlay .15s ease;
+    }
+    .modal-overlay.hidden { display: none; }
+    @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 36px 28px;
+      max-width: 520px;
+      width: calc(100% - 32px);
+      box-shadow: 0 20px 48px rgba(7,54,121,.24);
+      animation: slideUpModal .18s ease;
+    }
+    @keyframes slideUpModal { from { transform: translateY(18px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    .modal-box h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--azure-dragon);
+      font-family: "Roboto Condensed", "Orbitron", sans-serif;
+    }
+    .modal-box .modal-sub {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin: 0 0 24px;
+      line-height: 1.55;
+    }
+    .modal-choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 500px) {
+      .modal-choices { grid-template-columns: 1fr; }
+    }
+    .modal-choice-btn {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel-alt);
+      cursor: pointer;
+      padding: 18px 16px;
+      text-align: left;
+      transition: border-color .15s, background .15s, box-shadow .15s;
+    }
+    .modal-choice-btn:hover {
+      border-color: var(--cool-blue);
+      background: rgba(76,130,184,.06);
+      box-shadow: 0 4px 12px rgba(7,54,121,.1);
+    }
+    .modal-choice-btn.selected {
+      border-color: var(--azure-dragon);
+      background: rgba(7,54,121,.05);
+    }
+    .modal-choice-btn .mcb-icon { font-size: 26px; margin-bottom: 8px; }
+    .modal-choice-btn .mcb-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--azure-dragon);
+      font-family: "Roboto Condensed", sans-serif;
+      margin-bottom: 4px;
+    }
+    .modal-choice-btn .mcb-desc {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.45;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--argent);
+      border: 1px solid var(--border);
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: "Roboto Condensed", "Inter", sans-serif;
+      transition: color .15s, border-color .15s;
+    }
+    .btn-ghost:hover { color: var(--azure-dragon); border-color: var(--cool-blue); }
+
+    /* ── BYOK tab specific ── */
+    .byok-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 700px) {
+      .byok-grid { grid-template-columns: 1fr; }
+    }
+    .byok-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--cool-blue);
+      margin-bottom: 6px;
+    }
+    .byok-field input[type=password],
+    .byok-field input[type=text] {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-family: monospace;
+      background: var(--panel-alt);
+      color: var(--text);
+      transition: border-color .15s, box-shadow .15s;
+      box-sizing: border-box;
+    }
+    .byok-field input:focus {
+      outline: none;
+      border-color: var(--accent-border);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .byok-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: "Roboto Condensed", sans-serif;
+      letter-spacing: 0.3px;
+      margin-bottom: 18px;
+    }
+    .byok-status-badge.active {
+      background: rgba(24,128,56,.1);
+      color: var(--success-600);
+      border: 1px solid rgba(24,128,56,.3);
+      box-shadow: 0 0 0 3px rgba(24,128,56,.06);
+    }
+    .byok-status-badge.inactive {
+      background: rgba(87,88,90,.08);
+      color: var(--argent);
+      border: 1px solid var(--border);
+    }
+    /* ── BYOK validation panel ── */
+    .byok-validation-steps { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+    .byok-vstep {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      transition: border-color .15s, background .15s;
+    }
+    .byok-vstep.ok    { border-color: rgba(24,128,56,.3);  background: rgba(24,128,56,.05); }
+    .byok-vstep.warn  { border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.05); }
+    .byok-vstep.error { border-color: rgba(211,47,47,.3);   background: rgba(211,47,47,.05); }
+    .byok-vstep-icon { font-size: 15px; min-width: 18px; line-height: 1.6; text-align: center; }
+    .byok-vstep-content { flex: 1; }
+    .byok-vstep-label  { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 2px; }
+    .byok-vstep.ok    .byok-vstep-label { color: var(--success-600); }
+    .byok-vstep.warn  .byok-vstep-label { color: #b45309; }
+    .byok-vstep.error .byok-vstep-label { color: var(--danger); }
+    .byok-vstep.checking .byok-vstep-label { color: var(--argent); }
+    .byok-vstep-detail { font-size: 12px; color: var(--argent); line-height: 1.5; }
+    .byok-vstep-console-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-top: 5px; font-size: 11px; font-weight: 600;
+      color: var(--cool-blue); text-decoration: none;
+      border: 1px solid var(--cool-blue); border-radius: 4px;
+      padding: 2px 8px;
+    }
+    .byok-vstep-console-link:hover { background: rgba(var(--azure-rgb),.08); }
+    .byok-validation-summary {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      font-size: 12px; font-weight: 700;
+      margin-bottom: 2px;
+    }
+    /* ── Option selector (click A or B to reveal) ── */
+    .option-select-row {
+      display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .option-select-btn {
+      flex: 1; min-width: 180px; padding: 14px 18px; border-radius: 10px;
+      border: 2px solid var(--border); background: var(--panel-alt);
+      color: var(--azure-dragon); text-align: left; cursor: pointer;
+      transition: border-color .15s, background .15s, box-shadow .15s;
+    }
+    .option-select-btn .opt-title {
+      font-size: 13px; font-weight: 700; display: block; margin-bottom: 4px;
+    }
+    .option-select-btn .opt-desc {
+      font-size: 11px; color: var(--argent); display: block;
+    }
+    .option-select-btn.selected {
+      border-color: var(--cool-blue);
+      background: rgba(76,130,184,.1);
+      box-shadow: 0 0 0 3px rgba(76,130,184,.18);
+    }
+    .option-select-btn:hover:not(.selected) {
+      border-color: var(--cool-blue); background: rgba(76,130,184,.06);
+    }
+    .option-content { display: none; }
+    .option-content.visible { display: block; }
+
+    /* ── Service Config (Option A) ── */
+    .svc-section { margin-bottom: 18px; }
+    .svc-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .svc-pill {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--panel-alt);
+      color: var(--argent);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .15s, background .15s, color .15s;
+    }
+    .svc-pill.active {
+      border-color: var(--cool-blue);
+      background: rgba(76,130,184,.12);
+      color: var(--azure-dragon);
+    }
+    .svc-pill:hover:not(.active) {
+      border-color: var(--cool-blue);
+      color: var(--azure-dragon);
+    }
+    .svc-key-fields { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── Workflow strip ── */
+    .workflow-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 0 14px;
+      font-size: 11px;
+      font-family: "Roboto Condensed", sans-serif;
+    }
+    .workflow-step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      opacity: 0.55;
+      transition: opacity .2s, border-color .2s, background .2s;
+    }
+    .workflow-step.active {
+      opacity: 1;
+      border-color: var(--cool-blue);
+      background: rgba(76,130,184,.07);
+    }
+    .wf-num {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--desired-dawn);
+      color: var(--azure-dragon);
+      font-weight: 700;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .workflow-step.active .wf-num {
+      background: var(--azure-dragon);
+      color: #fff;
+    }
+    .wf-label { font-weight: 700; letter-spacing: .3px; color: var(--argent); }
+    .workflow-step.active .wf-label { color: var(--azure-dragon); }
+    .wf-arrow { color: var(--desired-dawn); font-size: 16px; font-weight: 300; }
+
+    /* ── Outline button variants ── */
+    .btn-outline {
+      background: var(--panel);
+      color: var(--azure-dragon);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--cool-blue);
+      background: rgba(76,130,184,.06);
+    }
+    .btn-danger-outline {
+      background: var(--panel);
+      color: var(--danger);
+      border: 1px solid rgba(211,47,47,.3);
+    }
+    .btn-danger-outline:hover {
+      background: rgba(234,67,53,.05);
+      border-color: var(--danger);
+    }
+
+    /* ── Spinner blue variant ── */
+    .spinner-blue {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(7,54,121,.2);
+      border-top-color: var(--azure-dragon);
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    /* ── Gemini model selector section ── */
+    .model-selector-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .model-select-field {
+      flex: 1;
+      min-width: 210px;
+    }
+    .model-select-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--cool-blue);
+      margin-bottom: 6px;
+    }
+    .model-select-field select {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-family: "Roboto Condensed", "Inter", sans-serif;
+      background: var(--panel-alt);
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234c82b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+    .model-select-field select:focus {
+      outline: none;
+      border-color: var(--accent-border);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .model-cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin: 14px 0;
+    }
+    .model-cost-table th {
+      text-align: left;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--cool-blue);
+      padding: 6px 10px;
+      background: rgba(76,130,184,.06);
+      border-bottom: 1px solid var(--border);
+    }
+    .model-cost-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(216,216,216,.5);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    .model-cost-table tr.selected-model td {
+      background: rgba(76,130,184,.07);
+      font-weight: 700;
+    }
+    .model-cost-table .cost-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .cost-low    { background: #188038; }
+    .cost-medium { background: #b45309; }
+    .cost-high   { background: #ea4335; }
+    .speed-fast   { color: #188038; font-weight: 700; }
+    .speed-medium { color: #b45309; font-weight: 700; }
+    .speed-slow   { color: #ea4335; font-weight: 700; }
+    /* model warning modal checkbox row */
+    .modal-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .modal-checkbox-row input[type=checkbox] {
+      width: 15px; height: 15px;
+      accent-color: var(--azure-dragon);
+      cursor: pointer;
+    }
+    .modal-checkbox-row span {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    /* ── UX/UI revamp ── */
+
+    /* Page background: lighter Desired Dawn tint for depth */
+    .page-main {
+      background: #f0f4f8;
+    }
+    .page-content {
+      background: transparent;
+    }
+
+    /* Header gradient with enforced white text */
+    .page-header {
+      background: linear-gradient(135deg, var(--black-beauty) 0%, var(--azure-dragon) 100%);
+      box-shadow: 0 2px 14px rgba(7,54,121,.45);
+    }
+    /* Defeat the global h1 { color: black-beauty !important } from sourcing_verify.css */
+    .page-header h1 {
+      color: #fff !important;
+    }
+
+    /* Tabs bar — light Desired Dawn tint background */
+    .tabs-bar {
+      background: #e8edf3;
+      border-radius: 10px 10px 0 0;
+      border-bottom-color: var(--cool-blue);
+      padding: 6px 8px 0;
+      gap: 2px;
+    }
+    .tab-btn {
+      border-radius: 7px 7px 0 0;
+      color: var(--azure-dragon);
+      background: rgba(216,216,216,.35);
+      border: 1px solid rgba(76,130,184,.2);
+      border-bottom: none;
+    }
+    .tab-btn:hover {
+      background: rgba(109,234,249,.18);
+      color: var(--azure-dragon);
+      border-color: var(--cool-blue);
+    }
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--azure-dragon);
+      border-color: var(--cool-blue);
+      border-bottom: 2px solid #ffffff;
+    }
+    /* Tabs active line gradient */
+    .tab-btn.active::after {
+      background: linear-gradient(90deg, var(--azure-dragon), var(--robins-egg));
+    }
+
+    /* Cards — white on tinted background */
+    .card {
+      background: #ffffff;
+      border: 1px solid #c8d4e0;
+      border-top: none;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(7,54,121,.09);
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--azure-dragon), var(--robins-egg));
+    }
+    /* Card h2 label */
+    .card h2 {
+      color: var(--azure-dragon) !important;
+    }
+
+    /* Workflow step active */
+    .workflow-step {
+      background: #e8edf3;
+      border-color: #c8d4e0;
+    }
+    .workflow-step.active {
+      background: linear-gradient(135deg, rgba(7,54,121,.12) 0%, rgba(76,130,184,.07) 100%);
+      border-color: var(--cool-blue);
+    }
+
+    /* Section label gradient line */
+    .section-label::after {
+      background: linear-gradient(to right, var(--cool-blue), transparent);
+    }
+
+    /* Upload zone enhanced */
+    .upload-zone {
+      background: #f4f7fb;
+      border-color: var(--cool-blue);
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--robins-egg);
+      background: rgba(109,234,249,.10);
+      box-shadow: 0 0 0 3px rgba(109,234,249,.10);
+    }
+
+    /* Info strip — Robin's Egg left accent */
+    .info-strip {
+      border-left: 3px solid var(--robins-egg);
+      background: rgba(109,234,249,.07);
+    }
+
+    /* BYOK status badge active */
+    .byok-status-badge.active {
+      box-shadow: 0 0 0 3px rgba(24,128,56,.08), 0 2px 8px rgba(24,128,56,.12);
+    }
+
+    /* btn-outline: Cool Blue border + text */
+    .btn-outline {
+      border-color: var(--cool-blue);
+      color: var(--cool-blue);
+    }
+    .btn-outline:hover {
+      background: linear-gradient(135deg, rgba(76,130,184,.1) 0%, rgba(7,54,121,.08) 100%);
+      border-color: var(--azure-dragon);
+      color: var(--azure-dragon);
+    }
+
+    /* Pre-flight panel Robin's Egg left accent */
+    .preflight-panel {
+      border-left: 3px solid var(--robins-egg);
+    }
+
+    /* Mapping preview panel */
+    .mapping-preview {
+      background: #f4f7fb;
+      border-color: #c8d4e0;
+    }
+
+    /* BYOK validation steps on tinted bg */
+    .byok-vstep {
+      background: #f4f7fb;
+    }
+
+    /* Textarea and text inputs on tinted bg */
+    textarea, input[type=url] {
+      background: #f4f7fb;
+      border-color: #c8d4e0;
+    }
+    .byok-field input[type=password],
+    .byok-field input[type=text] {
+      background: #f4f7fb;
+      border-color: #c8d4e0;
+    }
+
+    /* Port-grid and modal choices on tinted bg */
+    .modal-choice-btn {
+      background: #f4f7fb;
+    }
+    .modal-choice-btn:hover {
+      background: rgba(109,234,249,.10);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== Mode Selection Modal ===== -->
+<div class="modal-overlay hidden" id="modeModal" role="dialog" aria-modal="true" aria-labelledby="modeModalTitle">
+  <div class="modal-box">
+    <h3 id="modeModalTitle">How would you like to use these keys?</h3>
+    <p class="modal-sub" id="modeModalSub">Choose how these API keys will be applied. You can change this later.</p>
+    <div class="modal-choices">
+      <button class="modal-choice-btn selected" id="modePortingBtn" type="button">
+        <div class="mcb-icon">🚀</div>
+        <div class="mcb-title">Port to my system</div>
+        <div class="mcb-desc">Encrypt and store your keys for use with this platform's services.</div>
+      </button>
+      <button class="modal-choice-btn" id="modeByokBtn" type="button">
+        <div class="mcb-icon">🔑</div>
+        <div class="mcb-title">BYOK — Bring Your Own Keys <span id="byokDetectedBadge" style="display:none;font-size:10px;background:rgba(24,128,56,.12);color:#188038;border:1px solid rgba(24,128,56,.3);border-radius:10px;padding:2px 8px;font-family:'Roboto Condensed',sans-serif;font-weight:700;letter-spacing:.3px;vertical-align:middle">✓ Keys detected</span></div>
+        <div class="mcb-desc" id="byokModalDesc">Use your own Google Cloud keys for unlimited access. Usage is billed to your account.</div>
+      </button>
+    </div>
+    <div class="status-msg" id="modeModalStatus"></div>
+    <div class="modal-actions" style="margin-top:14px">
+      <button class="btn-ghost" id="modeModalCancel" type="button">Cancel</button>
+      <button class="btn btn-primary" id="modeModalConfirm" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Continue
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ===== End Modal ===== -->
+
+<!-- ===== Gemini Model Warning Modal ===== -->
+<div class="modal-overlay hidden" id="modelWarnModal" role="dialog" aria-modal="true" aria-labelledby="modelWarnTitle">
+  <div class="modal-box">
+    <h3 id="modelWarnTitle">⚠ Model Cost &amp; Performance Notice</h3>
+    <p class="modal-sub">Switching the Gemini model will affect all AI-powered operations for your account. Different models have significantly different cost and latency profiles — please review before confirming.</p>
+    <p style="font-size:13px;font-weight:700;color:var(--azure-dragon);margin:0 0 10px">Selected: <span id="modelWarnModelName" style="color:var(--cool-blue)"></span></p>
+    <table class="model-cost-table" id="modelWarnTable">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Cost</th>
+          <th>Speed</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <label class="modal-checkbox-row">
+      <input type="checkbox" id="modelWarnDontShow">
+      <span>Do not display this warning again</span>
+    </label>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn-ghost" id="modelWarnCancel" type="button">Cancel</button>
+      <button class="btn btn-primary" id="modelWarnConfirm" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirm &amp; Save
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ===== End Model Warning Modal ===== -->
+
+<div class="page-shell">
+
+<!-- ===== Left Navigation Sidebar ===== -->
+<nav class="nav-sidebar" aria-label="Main navigation">
+  <a href="/" class="nav-sidebar__brand">
+    <img src="/fioe-logo.svg" alt="FIOE" class="nav-sidebar__logo" />
+  </a>
+  <ul class="nav-sidebar__list">
+
+    <!-- Login with hover-expand sub-menu -->
+    <li class="nav-sidebar__item nav-sidebar__item--has-sub">
+      <span class="nav-sidebar__link" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+        <svg class="nav-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        <span>Login</span>
+        <svg class="nav-sidebar__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="11" height="11"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+      <ul class="nav-sidebar__submenu" role="menu">
+        <li><a href="http://localhost:8091/login.html" class="nav-sidebar__submenu-link" role="menuitem">Subscriber</a></li>
+        <li><a href="http://localhost:8091/sales_rep_register.html" class="nav-sidebar__submenu-link" role="menuitem">Staff</a></li>
+      </ul>
+    </li>
+
+    <li class="nav-sidebar__divider"></li>
+
+    <li class="nav-sidebar__item">
+      <a href="/" class="nav-sidebar__link">
+        <svg class="nav-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </a>
+    </li>
+
+    <li class="nav-sidebar__divider"></li>
+
+    <!-- Services -->
+    <li class="nav-sidebar__item nav-sidebar__item--has-sub">
+      <span class="nav-sidebar__link" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+        <svg class="nav-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Services</span>
+        <svg class="nav-sidebar__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="11" height="11"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+      <ul class="nav-sidebar__submenu" role="menu">
+        <li><a href="/AutoSourcing.html" class="nav-sidebar__submenu-link" role="menuitem">Autosourcing</a></li>
+        <li><a href="/SourcingVerify.html" class="nav-sidebar__submenu-link" role="menuitem">Talent Evaluation</a></li>
+        <li><a href="http://localhost:3000/" class="nav-sidebar__submenu-link" role="menuitem">Candidate Management</a></li>
+        <li><a href="http://localhost:4000/LookerDashboard.html" class="nav-sidebar__submenu-link" role="menuitem">Consulting Dashboard</a></li>
+      </ul>
+    </li>
+
+    <li class="nav-sidebar__divider"></li>
+
+    <li class="nav-sidebar__item">
+      <a href="#ai-agent" class="nav-sidebar__link">
+        <svg class="nav-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>AI Agent</span>
+      </a>
+    </li>
+
+    <li class="nav-sidebar__item">
+      <a href="/api_porting.html" class="nav-sidebar__link active">
+        <svg class="nav-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+        <span>API Porting</span>
+      </a>
+    </li>
+
+    <li class="nav-sidebar__item">
+      <a href="http://localhost:4000/community.html" class="nav-sidebar__link">
+        <svg class="nav-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <span>Marketplace</span>
+      </a>
+    </li>
+
+    <li class="nav-sidebar__item">
+      <a href="#contact" class="nav-sidebar__link">
+        <svg class="nav-sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span>Contact Us</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+<!-- ===== End Sidebar ===== -->
+
+<!-- ===== Main Content ===== -->
+<div class="page-main">
+
+  <div class="page-header">
+    <h1>
+      <span class="header-dot"></span>
+      API Porting
+    </h1>
+    <div class="header-right">
+      <a href="/admin_rate_limits.html" class="header-admin">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Admin
+      </a>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- Tab bar -->
+    <div class="tabs-bar" role="tablist" aria-label="API Porting sections">
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-upload" data-tab="tab-upload" data-workflow-step="wf-step-1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Upload Credentials
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-port" data-tab="tab-port" data-workflow-step="wf-step-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+        Port Data
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-byok" data-tab="tab-byok" data-workflow-step="wf-step-3">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+        BYOK
+      </button>
+    </div>
+
+    <!-- Workflow guide strip -->
+    <div class="workflow-strip" aria-hidden="true">
+      <div class="workflow-step active" id="wf-step-1">
+        <span class="wf-num">1</span>
+        <span class="wf-label">Upload Credentials</span>
+      </div>
+      <div class="wf-arrow" aria-hidden="true">›</div>
+      <div class="workflow-step" id="wf-step-2">
+        <span class="wf-num">2</span>
+        <span class="wf-label">Port Data</span>
+      </div>
+      <div class="wf-arrow" aria-hidden="true">›</div>
+      <div class="workflow-step" id="wf-step-3">
+        <span class="wf-num">3</span>
+        <span class="wf-label">Activate BYOK</span>
+      </div>
+    </div>
+
+    <!-- ══ TAB 1: Upload ══════════════════════════════════════════════════════ -->
+    <div class="tab-panel active" id="tab-upload">
+      <div class="card">
+        <h2>Submit API Credentials <span class="badge">Step 1</span></h2>
+        <p class="subtitle">
+          Select an option below, then configure your API keys.
+          All data is AES-256-GCM encrypted before storage.
+        </p>
+
+        <!-- Option selector row -->
+        <div class="option-select-row">
+          <button class="option-select-btn" id="optSelectA" type="button" onclick="_selectOption('A')">
+            <span class="opt-title">⚙️ Option A — Custom API Config</span>
+            <span class="opt-desc">Mix-and-match providers (Search Engine, LLM, Email Verification) and supply your own keys.</span>
+          </button>
+          <button class="option-select-btn" id="optSelectB" type="button" onclick="_selectOption('B')">
+            <span class="opt-title">🔑 Option B — Gemini Default Key</span>
+            <span class="opt-desc">Single-provider path focused on Gemini. Simpler setup.</span>
+          </button>
+        </div>
+
+        <div class="upload-grid" id="uploadGrid" style="display:none">
+          <!-- Option A — Custom API Config -->
+          <div class="upload-col option-content" id="optionAContent">
+            <p class="section-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+              Option A — Custom API Config
+            </p>
+
+            <div id="svcStatusBadge" class="byok-status-badge inactive" style="display:none">
+              <span id="svcStatusDot">⬤</span>
+              <span id="svcStatusText">Checking…</span>
+            </div>
+
+            <div class="info-strip" style="margin-bottom:14px">
+              <span class="info-icon">🔐</span>
+              <span>Keys are AES-256-GCM encrypted and scoped to your account only. Use platform defaults (no key required) or bring your own provider.</span>
+            </div>
+
+            <!-- Search Engine -->
+            <div class="svc-section">
+              <p class="section-label" style="font-size:11px;margin-bottom:8px">🔍 Search Engine</p>
+              <div class="svc-pills" id="svc-search-pills">
+                <button class="svc-pill active" data-svc="search" data-provider="google_cse">Google CSE (default)</button>
+                <button class="svc-pill" data-svc="search" data-provider="serper">Serper.dev</button>
+                <button class="svc-pill" data-svc="search" data-provider="dataforseo">DataforSEO</button>
+              </div>
+              <div class="svc-key-fields" id="svc-search-fields">
+                <div class="byok-field" id="svc-serper-field" style="display:none">
+                  <label for="svc_serper_key">SERPER_API_KEY</label>
+                  <input type="password" id="svc_serper_key" placeholder="…" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="byok-field" id="svc-dfs-login-field" style="display:none">
+                  <label for="svc_dfs_login">DATAFORSEO_LOGIN</label>
+                  <input type="text" id="svc_dfs_login" placeholder="login@example.com" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="byok-field" id="svc-dfs-pass-field" style="display:none">
+                  <label for="svc_dfs_pass">DATAFORSEO_PASSWORD</label>
+                  <input type="password" id="svc_dfs_pass" placeholder="password" autocomplete="off" spellcheck="false">
+                </div>
+              </div>
+            </div>
+
+            <!-- LLM -->
+            <div class="svc-section">
+              <p class="section-label" style="font-size:11px;margin-bottom:8px">🤖 LLM</p>
+              <div class="svc-pills" id="svc-llm-pills">
+                <button class="svc-pill active" data-svc="llm" data-provider="gemini">Gemini (default)</button>
+                <button class="svc-pill" data-svc="llm" data-provider="openai">OpenAI</button>
+                <button class="svc-pill" data-svc="llm" data-provider="anthropic">Anthropic</button>
+              </div>
+              <div class="svc-key-fields" id="svc-llm-fields">
+                <div class="byok-field" id="svc-openai-field" style="display:none">
+                  <label for="svc_openai_key">OPENAI_API_KEY</label>
+                  <input type="password" id="svc_openai_key" placeholder="sk-…" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="byok-field" id="svc-anthropic-field" style="display:none">
+                  <label for="svc_anthropic_key">ANTHROPIC_API_KEY</label>
+                  <input type="password" id="svc_anthropic_key" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">
+                </div>
+              </div>
+            </div>
+
+            <!-- Email Verification -->
+            <div class="svc-section">
+              <p class="section-label" style="font-size:11px;margin-bottom:8px">📧 Email Verification</p>
+              <div class="svc-pills" id="svc-email-pills">
+                <button class="svc-pill active" data-svc="email" data-provider="default">Default (no key)</button>
+                <button class="svc-pill" data-svc="email" data-provider="neverbounce">NeverBounce</button>
+                <button class="svc-pill" data-svc="email" data-provider="zerobounce">ZeroBounce</button>
+                <button class="svc-pill" data-svc="email" data-provider="bouncer">Bouncer</button>
+              </div>
+              <div class="svc-key-fields" id="svc-email-fields">
+                <div class="byok-field" id="svc-nb-field" style="display:none">
+                  <label for="svc_neverbounce_key">NEVERBOUNCE_API_KEY</label>
+                  <input type="password" id="svc_neverbounce_key" placeholder="secret_…" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="byok-field" id="svc-zb-field" style="display:none">
+                  <label for="svc_zerobounce_key">ZEROBOUNCE_API_KEY</label>
+                  <input type="password" id="svc_zerobounce_key" placeholder="…" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="byok-field" id="svc-bouncer-field" style="display:none">
+                  <label for="svc_bouncer_key">BOUNCER_API_KEY</label>
+                  <input type="password" id="svc_bouncer_key" placeholder="…" autocomplete="off" spellcheck="false">
+                </div>
+              </div>
+            </div>
+
+            <!-- Validation results -->
+            <div id="svcValidationPanel" style="display:none;margin-bottom:14px">
+              <p class="section-label" style="margin-bottom:10px">🔍 Service Validation</p>
+              <div id="svcValidationSteps" class="byok-validation-steps"></div>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+              <button class="btn btn-outline" id="svcValidateBtn" type="button">
+                <span class="spinner spinner-blue" id="svcValidateSpinner" style="display:none"></span>
+                🔍 Validate
+              </button>
+              <button class="btn btn-primary" id="svcActivateBtn" type="button" disabled>
+                <span class="spinner" id="svcActivateSpinner" style="display:none"></span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                Activate
+              </button>
+              <button class="btn btn-danger-outline" id="svcDeactivateBtn" type="button" style="display:none">
+                Deactivate
+              </button>
+            </div>
+            <div class="status-msg" id="svcStatus"></div>
+          </div>
+
+          <!-- OR vertical divider -->
+          <div class="or-col"><span>or</span></div>
+
+          <!-- Option B — Gemini Default Key -->
+          <div class="upload-col option-content" id="optionBContent">
+            <p class="section-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Option B — Gemini Default Key
+            </p>
+            <textarea id="apiKeyText" style="flex:1;min-height:180px" placeholder="Paste your API keys here, one per line&#10;e.g.&#10;GOOGLE_API_KEY=AIza...&#10;OPENAI_API_KEY=sk-..."></textarea>
+            <p class="field-hint" style="margin-top:6px">Each line should follow the format <code>KEY_NAME=value</code>.</p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block option-content" id="submitBtn" style="display:none">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Encrypt &amp; Submit
+        </button>
+        <div class="status-msg" id="uploadStatus"></div>
+      </div>
+    </div>
+
+    <!-- ══ TAB 2: Port Data ═══════════════════════════════════════════════════ -->
+    <div class="tab-panel" id="tab-port">
+      <div class="port-grid">
+        <div class="card">
+          <h2>Active Field Mapping <span class="badge">Step 2</span></h2>
+          <p class="subtitle">
+            The mapping below is applied when exporting your data. To set or change it, use the
+            <a href="/admin_rate_limits.html" style="color:var(--cool-blue);font-weight:700;">Admin → Porting tab</a>.
+          </p>
+
+          <div class="info-strip" id="mappingInfoStrip" style="display:none">
+            <span class="info-icon">ℹ️</span>
+            <span id="mappingInfoText"></span>
+          </div>
+
+          <p class="section-label">Mapping preview</p>
+          <div class="mapping-preview" id="mappingPreview">
+            <span class="no-mapping">Loading…</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Export &amp; Port <span class="badge">Step 3</span></h2>
+          <p class="subtitle">
+            Click <strong>Port Data</strong> to convert your process-table records into a JSON file
+            using the active field mapping. Optionally provide a target URL to push the data directly.
+          </p>
+
+          <!-- Pre-flight validation panel -->
+          <div class="preflight-panel" id="portPreflightPanel">
+            <div class="preflight-header">
+              <div class="preflight-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Pre-flight Check
+              </div>
+              <button class="btn-ghost preflight-recheck" id="portRecheckBtn" type="button">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Re-check
+              </button>
+            </div>
+            <div class="preflight-rows" id="portPreflightRows">
+              <!-- populated by JS -->
+            </div>
+            <div class="status-msg" id="portPreflightStatus"></div>
+          </div>
+
+          <p class="section-label" style="margin-top:18px">Target URL <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-soft)">(optional)</span></p>
+          <input type="url" id="targetUrl" placeholder="https://your-system.example.com/api/import">
+          <p class="field-hint">If provided, the JSON payload will be POST-ed to this URL in addition to being downloaded.</p>
+
+          <button class="btn btn-primary" id="portBtn" style="margin-top:20px" disabled>
+            <span class="spinner" id="portSpinner" style="display:none"></span>
+            Port Data
+          </button>
+          <div class="status-msg" id="portStatus"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAB 3: BYOK ════════════════════════════════════════════════════════ -->
+    <div class="tab-panel" id="tab-byok">
+      <div class="card">
+        <h2>Bring Your Own Keys <span class="badge">BYOK</span></h2>
+        <p class="subtitle">
+          Activate BYOK mode to use this platform with your own Google Cloud API keys.
+          In BYOK mode you enjoy <strong>unlimited access</strong> without consuming platform credits —
+          usage costs are billed directly to your Google Cloud account.
+          Your keys are encrypted and isolated to your account only.
+        </p>
+
+        <div id="byokStatusBadge" class="byok-status-badge inactive" style="display:none">
+          <span id="byokStatusDot">⬤</span>
+          <span id="byokStatusText">Checking…</span>
+        </div>
+
+        <div class="info-strip">
+          <span class="info-icon">ℹ️</span>
+          <span>All six keys below are required. They are encrypted and stored exclusively for your account — no other user can access them.</span>
+        </div>
+
+        <p class="section-label">Required API Keys</p>
+
+        <div class="byok-grid">
+          <div class="byok-field">
+            <label for="byok_gemini">GEMINI_API_KEY</label>
+            <input type="password" id="byok_gemini" placeholder="AIza…" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="byok-field">
+            <label for="byok_cse_api">GOOGLE_CSE_API_KEY</label>
+            <input type="password" id="byok_cse_api" placeholder="AIza…" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="byok-field">
+            <label for="byok_google_api">GOOGLE_API_KEY</label>
+            <input type="password" id="byok_google_api" placeholder="AIza…" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="byok-field">
+            <label for="byok_cse_cx">GOOGLE_CSE_CX</label>
+            <input type="text" id="byok_cse_cx" placeholder="Search engine ID" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="byok-field">
+            <label for="byok_client_id">GOOGLE_CLIENT_ID</label>
+            <input type="text" id="byok_client_id" placeholder="…apps.googleusercontent.com" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="byok-field">
+            <label for="byok_client_secret">GOOGLE_CLIENT_SECRET</label>
+            <input type="password" id="byok_client_secret" placeholder="GOCSPX-…" autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+
+        <!-- Admin-only: Vertex AI fields (revealed by JS when useraccess = 'admin') -->
+        <div id="adminByokFields" style="display:none">
+          <div style="border-top:1px solid var(--border);margin:6px 0 14px"></div>
+          <p class="section-label">Admin: Vertex AI Configuration</p>
+          <div class="info-strip">
+            <span class="info-icon">🔐</span>
+            <span>These additional fields are required for admin accounts to enable Vertex AI integration.</span>
+          </div>
+          <div class="byok-grid">
+            <div class="byok-field">
+              <label for="byok_vertex_project">VERTEX_PROJECT</label>
+              <input type="text" id="byok_vertex_project" placeholder="alpine-anvil-4xxxxx-xx" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="byok-field" style="grid-column:1/-1">
+              <label for="byok_gac">GOOGLE_APPLICATION_CREDENTIALS</label>
+              <input type="text" id="byok_gac" placeholder="path/to/service-account.json" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+        </div>
+
+        <!-- BYOK-only: Gemini Model Selector (revealed by JS when useraccess = 'byok') -->
+        <div id="byokModelSelectorSection" style="display:none">
+          <div style="border-top:1px solid var(--border);margin:6px 0 14px"></div>
+          <p class="section-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Gemini Model
+          </p>
+          <div class="info-strip" style="margin-bottom:14px">
+            <span class="info-icon">⚙️</span>
+            <span>Select the Gemini model used for all AI-powered operations under your BYOK account. <strong>Different models have varying costs and performance latencies</strong> — choose based on your budget and speed requirements. Default is <strong>Gemini 2.5 Flash Lite</strong>.</span>
+          </div>
+          <div class="model-selector-wrap">
+            <div class="model-select-field">
+              <label for="byokModelSelect">Active Model</label>
+              <select id="byokModelSelect">
+                <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Default — Lowest Cost)</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+              </select>
+            </div>
+            <button class="btn btn-outline" id="byokModelSaveBtn" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Model
+            </button>
+          </div>
+          <div class="status-msg" id="byokModelStatus"></div>
+        </div>
+
+        <!-- Validation results panel (hidden until Validate is clicked) -->
+        <div id="byokValidationPanel" style="display:none;margin-bottom:18px">
+          <p class="section-label" style="margin-bottom:10px">🔍 Credential Validation</p>
+          <div id="byokValidationSummary" class="byok-validation-summary" style="display:none"></div>
+          <div id="byokValidationSteps" class="byok-validation-steps"></div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-outline" id="byokValidateBtn" type="button">
+            <span class="spinner spinner-blue" id="byokValidateSpinner" style="display:none"></span>
+            🔍 Validate Keys
+          </button>
+          <button class="btn btn-primary" id="byokActivateBtn" type="button">
+            <span class="spinner" id="byokSpinner" style="display:none"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Activate Keys
+          </button>
+          <button class="btn btn-danger-outline" id="byokDeactivateBtn" type="button" style="display:none">
+            Deactivate BYOK
+          </button>
+        </div>
+        <div class="status-msg" id="byokStatus"></div>
+      </div>
+    </div>
+
+  </div><!-- /.page-content -->
+</div><!-- /.page-main -->
+</div><!-- /.page-shell -->
+
+<script>
+'use strict';
+
+// ── Auth gate + session banner ─────────────────────────────────────────────────
+(function authGateAndBanner() {
+  try {
+    function readCookie(name) {
+      const m = document.cookie && document.cookie.match(new RegExp('(?:^|\\s*)' + name + '=([^;]+)'));
+      return m && m[1] ? decodeURIComponent(m[1]) : null;
+    }
+    function getFirstNonEmpty() {
+      for (let i = 0; i < arguments.length; i++) {
+        const v = arguments[i];
+        if (v && String(v).trim()) return String(v).trim();
+      }
+      return '';
+    }
+    const storedUsername = getFirstNonEmpty(
+      sessionStorage.getItem('username'), localStorage.getItem('username'), readCookie('username')
+    );
+    const storedUserid = getFirstNonEmpty(
+      sessionStorage.getItem('userid'), localStorage.getItem('userid'), readCookie('userid')
+    );
+    if (!storedUsername || !storedUserid) {
+      const next = encodeURIComponent(location.pathname + location.search + location.hash);
+      location.replace('/login.html?next=' + next);
+      return;
+    }
+    window.__AP_ACTIVE_USERNAME = storedUsername;
+    window.__AP_ACTIVE_USERID   = storedUserid;
+
+    function _getInitials(name, fallback) {
+      const src = (name && String(name).trim()) ? name.trim() : (fallback || '');
+      const parts = src.split(/\s+/).filter(Boolean);
+      if (parts.length === 0) return (fallback || 'U').slice(0, 1).toUpperCase();
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0].slice(0, 1) + parts[1].slice(0, 1)).toUpperCase();
+    }
+
+    function buildBanner(nameForWelcome) {
+      if (document.getElementById('sessionBanner')) return;
+      const bar = document.createElement('div');
+      bar.id = 'sessionBanner';
+
+      const left = document.createElement('div');
+      left.style.cssText = 'display:flex;align-items:center;gap:12px';
+
+      const avatar = document.createElement('div');
+      avatar.style.cssText = [
+        'width:32px', 'height:32px', 'border-radius:7px', 'flex-shrink:0',
+        'background:linear-gradient(160deg,var(--cool-blue),var(--azure-dragon))',
+        'display:flex', 'align-items:center', 'justify-content:center',
+        'color:#fff', 'font-weight:700', 'font-size:13px',
+        'box-shadow:0 2px 8px rgba(7,54,121,.35)'
+      ].join(';');
+      avatar.textContent = _getInitials(nameForWelcome || storedUsername, storedUsername);
+
+      const textWrap = document.createElement('div');
+      textWrap.style.cssText = 'display:flex;flex-direction:column;line-height:1';
+
+      const welcome = document.createElement('div');
+      welcome.style.cssText = 'font-weight:700;color:#fff;font-size:14px;font-family:"Roboto Condensed",sans-serif';
+      welcome.textContent = 'Welcome, ' + (nameForWelcome || storedUsername);
+
+      const sub = document.createElement('div');
+      sub.style.cssText = 'font-size:11px;color:rgba(255,255,255,.7);margin-top:3px;font-family:"Roboto Condensed",sans-serif';
+      sub.textContent = storedUsername;
+
+      textWrap.appendChild(welcome);
+      textWrap.appendChild(sub);
+      left.appendChild(avatar);
+      left.appendChild(textWrap);
+
+      const right = document.createElement('div');
+      right.style.cssText = 'display:flex;align-items:center;gap:8px;flex-shrink:0';
+
+      const logoutBtn = document.createElement('button');
+      logoutBtn.type = 'button';
+      logoutBtn.textContent = 'Logout';
+      logoutBtn.style.cssText = [
+        'background:transparent', 'color:rgba(255,255,255,.9)', 'border:1px solid rgba(255,255,255,.3)',
+        'padding:7px 14px', 'border-radius:7px', 'font-weight:700', 'cursor:pointer',
+        'font-family:"Roboto Condensed",sans-serif', 'font-size:12px', 'letter-spacing:.3px'
+      ].join(';');
+      logoutBtn.addEventListener('click', function () {
+        try {
+          ['username', 'userid', 'fullname', 'role_tag', 'account_token'].forEach(k => {
+            sessionStorage.removeItem(k);
+            localStorage.removeItem(k);
+            document.cookie = k + '=; Max-Age=0; path=/';
+          });
+        } catch (_) {}
+        location.replace('/login.html');
+      });
+
+      right.appendChild(logoutBtn);
+      bar.appendChild(left);
+      bar.appendChild(right);
+
+      // Inject user chip into the page header right-side wrapper
+      const headerRight = document.querySelector('.header-right');
+      if (headerRight) {
+        headerRight.prepend(bar);
+      } else {
+        // Fallback: inject into page-header before admin link
+        const pageHeader = document.querySelector('.page-header');
+        if (pageHeader) pageHeader.appendChild(bar);
+      }
+    }
+
+    const fullname = getFirstNonEmpty(
+      sessionStorage.getItem('fullname'), localStorage.getItem('fullname'), readCookie('fullname')
+    );
+    if (fullname) {
+      buildBanner(fullname);
+    } else {
+      fetch('/user/resolve?username=' + encodeURIComponent(storedUsername), { credentials: 'same-origin' })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          const name = data && data.fullname ? data.fullname : storedUsername;
+          if (data && data.fullname) {
+            try {
+              sessionStorage.setItem('fullname', data.fullname);
+              localStorage.setItem('fullname', data.fullname);
+            } catch (_) {}
+          }
+          buildBanner(name);
+        })
+        .catch(() => buildBanner(storedUsername));
+    }
+  } catch (e) {
+    try { location.replace('/login.html'); } catch (_) {}
+  }
+})();
+
+// ── Admin / BYOK status ───────────────────────────────────────────────────────
+window.__AP_IS_ADMIN = false;
+window.__AP_IS_BYOK  = false;
+(async function _fetchUserStatus() {
+  try {
+    const uname = window.__AP_ACTIVE_USERNAME || '';
+    const url = '/user/resolve' + (uname ? '?username=' + encodeURIComponent(uname) : '');
+    const r = await fetch(url, { credentials: 'same-origin' });
+    if (!r.ok) return;
+    const data = await r.json();
+    const ua = (data.useraccess || '').trim().toLowerCase();
+    window.__AP_IS_ADMIN = (ua === 'admin');
+    window.__AP_IS_BYOK  = (ua === 'byok');
+    if (window.__AP_IS_ADMIN) {
+      const el = document.getElementById('adminByokFields');
+      if (el) el.style.display = '';
+    }
+    if (window.__AP_IS_BYOK) {
+      const el = document.getElementById('byokModelSelectorSection');
+      if (el) el.style.display = '';
+      await loadCurrentGeminiModel();
+    }
+  } catch (_) {}
+})();
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function switchTab(tabId) {
+  const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+  if (btn) {
+    btn.click();
+  } else if (typeof console !== 'undefined') {
+    console.warn('switchTab: tab not found:', tabId);
+  }
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    // Sync workflow strip
+    document.querySelectorAll('.workflow-step').forEach(s => s.classList.remove('active'));
+    const stepId = btn.dataset.workflowStep;
+    if (stepId) {
+      const el = document.getElementById(stepId);
+      if (el) el.classList.add('active');
+    }
+    // Auto-run preflight when Port Data tab is selected
+    if (btn.dataset.tab === 'tab-port') {
+      // Use a short delay so the panel is visible before checks start
+      setTimeout(() => runPortPreflight(), 100);
+    }
+  });
+});
+
+// ── Upload tab ────────────────────────────────────────────────────────────────
+const apiKeyText   = document.getElementById('apiKeyText');
+const submitBtn    = document.getElementById('submitBtn');
+const uploadStatus = document.getElementById('uploadStatus');
+
+// Live-parse textarea as user types (debounced)
+let _byokDebounce = null;
+apiKeyText.addEventListener('input', () => {
+  clearTimeout(_byokDebounce);
+  _byokDebounce = setTimeout(() => checkAndAutofillByok(apiKeyText.value), 400);
+});
+
+// ── BYOK autofill helpers ─────────────────────────────────────────────────────
+const BYOK_REQUIRED = [
+  'GEMINI_API_KEY', 'GOOGLE_CSE_API_KEY', 'GOOGLE_API_KEY',
+  'GOOGLE_CSE_CX', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'
+];
+
+// Maps BYOK key name → input field ID in the BYOK tab
+const BYOK_FIELD_MAP = {
+  GEMINI_API_KEY:       'byok_gemini',
+  GOOGLE_CSE_API_KEY:   'byok_cse_api',
+  GOOGLE_API_KEY:       'byok_google_api',
+  GOOGLE_CSE_CX:        'byok_cse_cx',
+  GOOGLE_CLIENT_ID:     'byok_client_id',
+  GOOGLE_CLIENT_SECRET: 'byok_client_secret',
+};
+
+// Admin-only additional keys required for Vertex AI integration
+const BYOK_ADMIN_REQUIRED = [
+  'VERTEX_PROJECT', 'GOOGLE_APPLICATION_CREDENTIALS'
+];
+const BYOK_ADMIN_FIELD_MAP = {
+  VERTEX_PROJECT:                 'byok_vertex_project',
+  GOOGLE_APPLICATION_CREDENTIALS: 'byok_gac',
+};
+
+let _detectedByokKeys = null; // null = not all required keys detected; object = all 6 required keys present
+
+/**
+ * Parse text for KEY=VALUE pairs.  If all 6 required BYOK keys are found,
+ * auto-populate the BYOK tab fields and set _detectedByokKeys.
+ */
+function checkAndAutofillByok(text) {
+  const parsed = parseKeyValueText(text);
+  const foundAll = BYOK_REQUIRED.every(k => parsed[k]);
+  if (foundAll) {
+    _detectedByokKeys = parsed;
+    // Populate BYOK tab inputs (user can review before clicking Activate)
+    for (const [key, fieldId] of Object.entries(BYOK_FIELD_MAP)) {
+      const el = document.getElementById(fieldId);
+      if (el && parsed[key]) el.value = parsed[key];
+    }
+    // Autofill admin Vertex AI fields if present and user is admin
+    if (window.__AP_IS_ADMIN) {
+      for (const [key, fieldId] of Object.entries(BYOK_ADMIN_FIELD_MAP)) {
+        const el = document.getElementById(fieldId);
+        if (el && parsed[key]) el.value = parsed[key];
+      }
+    }
+    // Show autofill notification on the upload tab
+    showStatus(uploadStatus,
+      '✓ Google Cloud API keys detected — BYOK tab fields have been pre-filled. ' +
+      'Review them in the ☁️ BYOK tab and click "Activate Keys" to enable BYOK mode.',
+      'success');
+  } else {
+    _detectedByokKeys = null;
+  }
+}
+
+// ── Mode selection modal ──────────────────────────────────────────────────────
+const modeModal        = document.getElementById('modeModal');
+const modeModalStatus  = document.getElementById('modeModalStatus');
+const modeModalSub     = document.getElementById('modeModalSub');
+const modeModalCancel  = document.getElementById('modeModalCancel');
+const modeModalConfirm = document.getElementById('modeModalConfirm');
+const modePortingBtn   = document.getElementById('modePortingBtn');
+const modeByokBtn      = document.getElementById('modeByokBtn');
+const byokDetectedBadge = document.getElementById('byokDetectedBadge');
+const byokModalDesc    = document.getElementById('byokModalDesc');
+
+let _selectedMode = 'porting'; // 'porting' | 'byok'
+let _pendingBody  = null;      // body to submit after modal confirm
+
+function openModeModal(body) {
+  _pendingBody  = body;
+  showStatus(modeModalStatus, '');
+
+  const hasAllByokKeys = _detectedByokKeys && BYOK_REQUIRED.every(k => _detectedByokKeys[k]);
+
+  if (hasAllByokKeys) {
+    // Pre-select BYOK and show "keys detected" badge
+    _selectedMode = 'byok';
+    modeByokBtn.classList.add('selected');
+    modePortingBtn.classList.remove('selected');
+    byokDetectedBadge.style.display = '';
+    byokModalDesc.textContent =
+      'All required Google Cloud keys are present. Activate BYOK for unlimited access — billed to your account.';
+    modeModalSub.textContent =
+      'Google Cloud API keys detected in your input. Choose how to proceed.';
+  } else {
+    _selectedMode = 'porting';
+    modePortingBtn.classList.add('selected');
+    modeByokBtn.classList.remove('selected');
+    byokDetectedBadge.style.display = 'none';
+    byokModalDesc.textContent =
+      'Use your own Google Cloud keys for unlimited access. Usage is billed to your account.';
+    modeModalSub.textContent = 'Choose how these API keys will be applied. You can change this later.';
+  }
+
+  modeModal.classList.remove('hidden');
+}
+
+modePortingBtn.addEventListener('click', () => {
+  _selectedMode = 'porting';
+  modePortingBtn.classList.add('selected');
+  modeByokBtn.classList.remove('selected');
+  showStatus(modeModalStatus, '');
+});
+
+modeByokBtn.addEventListener('click', () => {
+  _selectedMode = 'byok';
+  modeByokBtn.classList.add('selected');
+  modePortingBtn.classList.remove('selected');
+  showStatus(modeModalStatus, '');
+});
+
+modeModalCancel.addEventListener('click', () => {
+  modeModal.classList.add('hidden');
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Encrypt &amp; Submit';
+});
+
+modeModal.addEventListener('click', e => {
+  if (e.target === modeModal) modeModalCancel.click();
+});
+
+modeModalConfirm.addEventListener('click', async () => {
+  if (_selectedMode === 'byok') {
+    // Validate that the pasted/uploaded content contains all required BYOK keys
+    let textContent = '';
+    if (_pendingBody && _pendingBody.type === 'text') {
+      textContent = _pendingBody.content || '';
+    } else if (_pendingBody && _pendingBody.type === 'file') {
+      // For file uploads, decode the base64 content
+      try {
+        textContent = atob(_pendingBody.content || '');
+      } catch (_) {
+        showStatus(modeModalStatus,
+          '⚠ Could not decode the uploaded file content. Try pasting the keys directly in the text area instead.',
+          'warn');
+        return;
+      }
+    }
+    const parsed = parseKeyValueText(textContent);
+    const missing = BYOK_REQUIRED.filter(k => !parsed[k]);
+    if (missing.length > 0) {
+      showStatus(modeModalStatus,
+        '⚠ Missing required BYOK keys: ' + missing.join(', ') +
+        '. Please complete the setup in the BYOK tab or add all required keys before continuing.',
+        'warn');
+      return;
+    }
+    // All BYOK keys present — activate BYOK, then also upload the keys
+    modeModal.classList.add('hidden');
+    await doUploadAndByok(_pendingBody, parsed);
+  } else {
+    // Porting mode — standard upload
+    modeModal.classList.add('hidden');
+    await doUpload(_pendingBody);
+  }
+});
+
+function parseKeyValueText(text) {
+  const out = {};
+  (text || '').split('\n').forEach(line => {
+    const t = line.trim();
+    if (!t || t.startsWith('#')) return;
+    const idx = t.indexOf('=');
+    if (idx > 0) {
+      const k = t.substring(0, idx).trim();
+      const v = t.substring(idx + 1).trim();
+      if (k && v) out[k] = v;
+    }
+  });
+  return out;
+}
+
+async function doUploadAndByok(body, parsedKeys) {
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span> Activating BYOK…';
+  try {
+    // First activate BYOK keys
+    const byokPayload = {};
+    BYOK_REQUIRED.forEach(k => { byokPayload[k] = parsedKeys[k]; });
+    const r1 = await fetch('/api/porting/byok/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin',
+      body: JSON.stringify(byokPayload),
+    });
+    const d1 = await r1.json();
+    if (!r1.ok) {
+      showStatus(uploadStatus, d1.error || 'BYOK activation failed.', 'error');
+      return;
+    }
+    // Also upload the full key file
+    const r2 = await fetch('/api/porting/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin',
+      body: JSON.stringify(body),
+    });
+    const d2 = await r2.json();
+    if (!r2.ok) {
+      showStatus(uploadStatus,
+        '✓ BYOK mode activated successfully. Note: The credential file upload encountered an issue — ' +
+        (d2.error || 'upload failed') + '. Your BYOK keys are active.',
+        'warn');
+    } else {
+      showStatus(uploadStatus,
+        '✓ BYOK mode activated! Your Google Cloud keys are linked to your account. ' +
+        'Credentials also encrypted and stored.', 'success');
+    }
+    updateByokStatusBadge(true);
+    clearUploadForm();
+    // Redirect to BYOK tab so user sees their active BYOK status
+    setTimeout(() => switchTab('tab-byok'), 600);
+  } catch (err) {
+    showStatus(uploadStatus, 'Network error: ' + err.message, 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Encrypt &amp; Submit';
+  }
+}
+
+async function doUpload(body) {
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span> Uploading…';
+  try {
+    const r = await fetch('/api/porting/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin',
+      body: JSON.stringify(body),
+    });
+    const data = await r.json();
+    if (!r.ok) { showStatus(uploadStatus, data.error || 'Upload failed.', 'error'); return; }
+    // If BYOK keys were detected during input, add a hint to go to the BYOK tab
+    const byokHint = _detectedByokKeys && BYOK_REQUIRED.every(k => _detectedByokKeys[k])
+      ? ' Google Cloud API keys were detected and pre-filled in the ☁️ BYOK tab — click "Activate Keys" there to enable BYOK mode.'
+      : '';
+    showStatus(uploadStatus, '✓ Credentials encrypted and submitted successfully.' + byokHint, 'success');
+    clearUploadForm();
+    // Redirect to Port Data tab to continue workflow
+    setTimeout(() => switchTab('tab-port'), 600);
+  } catch (err) {
+    showStatus(uploadStatus, 'Network error: ' + err.message, 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Encrypt &amp; Submit';
+  }
+}
+
+function clearUploadForm() {
+  apiKeyText.value = '';
+  _detectedByokKeys = null;
+}
+
+submitBtn.addEventListener('click', async () => {
+  showStatus(uploadStatus, '');
+  const textVal = apiKeyText.value.trim();
+  if (!textVal) {
+    showStatus(uploadStatus, 'Please paste your API keys before submitting.', 'error');
+    return;
+  }
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span> Preparing…';
+  try {
+    const body = { type: 'text', filename: 'api_keys.txt', content: textVal };
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Encrypt &amp; Submit';
+    openModeModal(body);
+  } catch (err) {
+    showStatus(uploadStatus, 'Error preparing submission: ' + err.message, 'error');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Encrypt &amp; Submit';
+  }
+});
+
+// ── Porting tab ───────────────────────────────────────────────────────────────
+const mappingPreview      = document.getElementById('mappingPreview');
+const mappingInfoStrip    = document.getElementById('mappingInfoStrip');
+const mappingInfoText     = document.getElementById('mappingInfoText');
+const portBtn             = document.getElementById('portBtn');
+const portSpinner         = document.getElementById('portSpinner');
+const targetUrlInput      = document.getElementById('targetUrl');
+const portStatus          = document.getElementById('portStatus');
+const portPreflightRows   = document.getElementById('portPreflightRows');
+const portPreflightStatus = document.getElementById('portPreflightStatus');
+const portRecheckBtn      = document.getElementById('portRecheckBtn');
+
+// Track per-check results so portBtn is only enabled when all pass
+let _portCheckResults = { credentials: null, mapping: null };
+
+function _renderPreflightRow(id, label, state, detail, fixHref, fixLabel) {
+  const existing = document.getElementById('pfr-' + id);
+  const icons = {
+    pending: '…',
+    ok: '✓',
+    warn: '!',
+    error: '✗',
+  };
+  const html = `
+    <div class="preflight-row" id="pfr-${id}">
+      <div class="preflight-icon ${state}">${icons[state] || '…'}</div>
+      <div class="preflight-row-body">
+        <div class="preflight-row-label">${escHtml(label)}</div>
+        ${detail ? `<div class="preflight-row-detail">${escHtml(detail)}</div>` : ''}
+        ${fixHref ? `<div class="preflight-row-fix"><a href="${escHtml(fixHref)}" target="_blank" rel="noopener noreferrer">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          ${escHtml(fixLabel || 'Fix this →')}
+        </a></div>` : ''}
+      </div>
+    </div>`;
+  if (existing) {
+    existing.outerHTML = html;
+  } else {
+    portPreflightRows.insertAdjacentHTML('beforeend', html);
+  }
+}
+
+function _updatePortBtnState() {
+  const allPassed = Object.values(_portCheckResults).every(v => v === true);
+  portBtn.disabled = !allPassed;
+}
+
+async function runPortPreflight() {
+  portPreflightRows.innerHTML = '';
+  showStatus(portPreflightStatus, '');
+  _portCheckResults = { credentials: null, mapping: null };
+  portBtn.disabled = true;
+
+  // Skeleton rows
+  _renderPreflightRow('credentials', 'API credentials on file', 'pending', 'Checking…');
+  _renderPreflightRow('mapping', 'Field mapping configured', 'pending', 'Checking…');
+  _renderPreflightRow('byok', 'Porting mode ready', 'pending', 'Checking…');
+
+  // Check 1: credentials on file
+  try {
+    const r = await fetch('/api/porting/credentials/status', { credentials: 'same-origin' });
+    const d = await r.json();
+    if (d.credentials_on_file) {
+      _renderPreflightRow('credentials', 'API credentials on file', 'ok', 'Encrypted credential file found.');
+      _portCheckResults.credentials = true;
+    } else {
+      _renderPreflightRow('credentials', 'API credentials on file', 'error',
+        'No credentials uploaded yet. Go to the Upload Credentials tab to submit your API keys.',
+        null, null);
+      _portCheckResults.credentials = false;
+    }
+  } catch (e) {
+    _renderPreflightRow('credentials', 'API credentials on file', 'error', 'Check failed: ' + e.message);
+    _portCheckResults.credentials = false;
+  }
+
+  // Check 2: mapping configured — reuse the already-loaded mapping data
+  try {
+    const r = await fetch('/api/porting/mapping', { credentials: 'same-origin' });
+    const d = await r.json();
+    if (d.mapping && Object.keys(d.mapping).length > 0) {
+      const count = Object.keys(d.mapping).length;
+      _renderPreflightRow('mapping', 'Field mapping configured', 'ok',
+        `${count} field${count > 1 ? 's' : ''} mapped and ready.`);
+      _portCheckResults.mapping = true;
+    } else {
+      _renderPreflightRow('mapping', 'Field mapping configured', 'error',
+        'No field mapping confirmed. Configure one in Admin → Porting tab before exporting.',
+        '/admin_rate_limits.html', 'Open Admin → Porting tab');
+      _portCheckResults.mapping = false;
+    }
+  } catch (e) {
+    _renderPreflightRow('mapping', 'Field mapping configured', 'error', 'Check failed: ' + e.message);
+    _portCheckResults.mapping = false;
+  }
+
+  // Check 3: BYOK / system active
+  try {
+    const r = await fetch('/api/porting/byok/status', { credentials: 'same-origin' });
+    const d = await r.json();
+    if (d.byok_active) {
+      _renderPreflightRow('byok', 'Porting mode ready', 'ok',
+        'BYOK active — usage billed directly to your Google Cloud account.');
+    } else {
+      _renderPreflightRow('byok', 'Porting mode ready', 'ok',
+        'Using platform API keys — standard credit usage applies.');
+    }
+  } catch (e) {
+    _renderPreflightRow('byok', 'Porting mode ready', 'warn', 'Could not verify service status — ' + e.message);
+  }
+
+  _updatePortBtnState();
+
+  const allPassed = Object.values(_portCheckResults).every(v => v === true);
+  const anyFailed = Object.values(_portCheckResults).some(v => v === false);
+  if (allPassed) {
+    showStatus(portPreflightStatus, '✓ All checks passed — ready to port.', 'success');
+  } else if (anyFailed) {
+    showStatus(portPreflightStatus, 'One or more checks failed. Resolve the issues above before porting.', 'error');
+  }
+}
+
+// Load mapping preview and run preflight checks
+(async () => {
+  try {
+    const r = await fetch('/api/porting/mapping', { credentials: 'same-origin' });
+    if (r.status === 401) {
+      mappingPreview.innerHTML = '<span class="no-mapping">Not logged in — please <a href="/login.html">sign in</a>.</span>';
+      portBtn.disabled = true; return;
+    }
+    const data = await r.json();
+    if (!data.mapping) {
+      mappingPreview.innerHTML = '<span class="no-mapping">No mapping confirmed yet.</span>';
+      mappingInfoStrip.style.display = 'flex';
+      mappingInfoText.textContent = 'No field mapping has been confirmed. Go to Admin → Porting tab to set one up before porting.';
+    } else {
+      const lines = Object.entries(data.mapping)
+        .map(([ext, proc]) => `${ext}  →  ${proc ?? '(skip)'}`)
+        .join('\n');
+      mappingPreview.textContent = lines;
+    }
+  } catch (err) {
+    mappingPreview.innerHTML = `<span class="no-mapping">Could not load mapping: ${escHtml(err.message)}</span>`;
+  }
+})();
+
+portRecheckBtn.addEventListener('click', () => runPortPreflight());
+
+portBtn.addEventListener('click', async () => {
+  showStatus(portStatus, '');
+  portBtn.disabled = true;
+  portSpinner.style.display = 'inline-block';
+  portBtn.childNodes[portBtn.childNodes.length - 1].textContent = ' Exporting…';
+  try {
+    const body = {};
+    const tv = targetUrlInput.value.trim();
+    if (tv) body.targetUrl = tv;
+    const r = await fetch('/api/porting/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin',
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({ error: r.statusText }));
+      showStatus(portStatus, err.error || 'Export failed.', 'error');
+      return;
+    }
+    const blob = await r.blob();
+    const fname = (r.headers.get('Content-Disposition') || '')
+      .match(/filename="([^"]+)"/)?.[1] || 'porting_export.json';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = fname;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    showStatus(portStatus, '✓ Data exported successfully' + (tv ? ' and pushed to target URL.' : '.'), 'success');
+  } catch (err) {
+    showStatus(portStatus, 'Network error: ' + err.message, 'error');
+  } finally {
+    portBtn.disabled = false;
+    portSpinner.style.display = 'none';
+    portBtn.childNodes[portBtn.childNodes.length - 1].textContent = ' Port Data';
+  }
+});
+
+// ── BYOK tab ──────────────────────────────────────────────────────────────────
+const byokValidateBtn      = document.getElementById('byokValidateBtn');
+const byokValidateSpinner  = document.getElementById('byokValidateSpinner');
+const byokValidationPanel  = document.getElementById('byokValidationPanel');
+const byokValidationSteps  = document.getElementById('byokValidationSteps');
+const byokValidationSummary = document.getElementById('byokValidationSummary');
+const byokActivateBtn   = document.getElementById('byokActivateBtn');
+const byokDeactivateBtn = document.getElementById('byokDeactivateBtn');
+const byokSpinner       = document.getElementById('byokSpinner');
+const byokStatusEl      = document.getElementById('byokStatus');
+const byokStatusBadge   = document.getElementById('byokStatusBadge');
+const byokStatusDot     = document.getElementById('byokStatusDot');
+const byokStatusText    = document.getElementById('byokStatusText');
+
+// BYOK_FIELD_MAP is defined above in the Upload tab section (shared reference)
+
+function updateByokStatusBadge(active) {
+  byokStatusBadge.style.display = 'inline-flex';
+  if (active) {
+    byokStatusBadge.className = 'byok-status-badge active';
+    byokStatusDot.textContent = '⬤';
+    byokStatusText.textContent = 'BYOK Active — your keys are linked to this account';
+    byokDeactivateBtn.style.display = '';
+  } else {
+    byokStatusBadge.className = 'byok-status-badge inactive';
+    byokStatusDot.textContent = '⬤';
+    byokStatusText.textContent = 'BYOK Inactive — enter your keys below to activate';
+    byokDeactivateBtn.style.display = 'none';
+  }
+}
+
+// Load BYOK status on page load
+(async () => {
+  try {
+    byokStatusBadge.style.display = 'inline-flex';
+    byokStatusText.textContent = 'Checking…';
+    const r = await fetch('/api/porting/byok/status', { credentials: 'same-origin' });
+    if (!r.ok) { byokStatusBadge.style.display = 'none'; return; }
+    const data = await r.json();
+    updateByokStatusBadge(data.byok_active);
+  } catch (_) {
+    byokStatusBadge.style.display = 'none';
+  }
+})();
+
+/** Build the BYOK key payload from form fields. Returns { payload, missing }. */
+function _buildByokPayload() {
+  const payload = {}, missing = [];
+  for (const [key, fieldId] of Object.entries(BYOK_FIELD_MAP)) {
+    const val = document.getElementById(fieldId).value.trim();
+    if (!val) missing.push(key); else payload[key] = val;
+  }
+  // Admin users must also supply Vertex AI keys
+  if (window.__AP_IS_ADMIN) {
+    for (const [key, fieldId] of Object.entries(BYOK_ADMIN_FIELD_MAP)) {
+      const val = document.getElementById(fieldId).value.trim();
+      if (!val) missing.push(key); else payload[key] = val;
+    }
+  }
+  return { payload, missing };
+}
+
+/**
+ * Renders structured validation results into #byokValidationPanel.
+ * Returns true when there are no hard errors (ok or warn only).
+ */
+function renderValidationResults(results) {
+  byokValidationSteps.innerHTML = '';
+  const ICONS = { ok: '✓', warn: '⚠', error: '✗', checking: '…' };
+  let hasError = false, hasWarn = false;
+  for (const step of results) {
+    if (step.status === 'error') hasError = true;
+    if (step.status === 'warn')  hasWarn  = true;
+    const el = document.createElement('div');
+    el.className = 'byok-vstep ' + (step.status || 'checking');
+
+    const iconEl = document.createElement('div');
+    iconEl.className = 'byok-vstep-icon';
+    iconEl.textContent = ICONS[step.status] || '…';
+
+    const contentEl = document.createElement('div');
+    contentEl.className = 'byok-vstep-content';
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'byok-vstep-label';
+    labelEl.textContent = step.label;
+
+    const detailEl = document.createElement('div');
+    detailEl.className = 'byok-vstep-detail';
+    detailEl.textContent = step.detail || '';
+
+    contentEl.appendChild(labelEl);
+    contentEl.appendChild(detailEl);
+
+    if (step.consoleUrl) {
+      const linkEl = document.createElement('a');
+      linkEl.href = step.consoleUrl;
+      linkEl.target = '_blank';
+      linkEl.rel = 'noopener noreferrer';
+      linkEl.className = 'byok-vstep-console-link';
+      linkEl.textContent = '→ Open Google Cloud Console';
+      contentEl.appendChild(linkEl);
+    }
+    el.appendChild(iconEl);
+    el.appendChild(contentEl);
+    byokValidationSteps.appendChild(el);
+  }
+
+  byokValidationSummary.style.display = 'flex';
+  if (hasError) {
+    byokValidationSummary.className = 'byok-validation-summary has-error';
+    byokValidationSummary.innerHTML = '✗ &nbsp;Validation failed — fix the errors above before activating BYOK.';
+  } else if (hasWarn) {
+    byokValidationSummary.className = 'byok-validation-summary has-warn';
+    byokValidationSummary.innerHTML = '⚠ &nbsp;Validation passed with warnings. Review the details above, then activate.';
+  } else {
+    byokValidationSummary.className = 'byok-validation-summary all-ok';
+    byokValidationSummary.innerHTML = '✓ &nbsp;All checks passed — keys are valid. Click "Activate Keys" to proceed.';
+  }
+  byokValidationPanel.style.display = '';
+  return !hasError;
+}
+
+// ── Validate Keys ─────────────────────────────────────────────────────────────
+byokValidateBtn.addEventListener('click', async () => {
+  showStatus(byokStatusEl, '');
+  const { payload, missing } = _buildByokPayload();
+  if (missing.length > 0) {
+    showStatus(byokStatusEl, '⚠ Please fill in all required fields: ' + missing.join(', '), 'warn');
+    return;
+  }
+  byokValidateBtn.disabled = true;
+  byokValidateSpinner.style.display = 'inline-block';
+  // Show skeleton "checking" rows immediately for feedback
+  byokValidationSteps.innerHTML = '';
+  byokValidationSummary.style.display = 'none';
+  byokValidationPanel.style.display = '';
+  const skeletonLabels = ['Gemini API', 'Custom Search API', 'GOOGLE_API_KEY Format', 'OAuth Client Credentials'];
+  if (window.__AP_IS_ADMIN) {
+    skeletonLabels.push('Vertex AI Configuration');
+  }
+  skeletonLabels.forEach(label => {
+    const el = document.createElement('div');
+    el.className = 'byok-vstep checking';
+    el.innerHTML =
+      `<div class="byok-vstep-icon">…</div>` +
+      `<div class="byok-vstep-content">` +
+        `<div class="byok-vstep-label">${escHtml(label)}</div>` +
+        `<div class="byok-vstep-detail">Checking…</div>` +
+      `</div>`;
+    byokValidationSteps.appendChild(el);
+  });
+  try {
+    const r = await fetch('/api/porting/byok/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      byokValidationPanel.style.display = 'none';
+      showStatus(byokStatusEl, data.error || 'Validation failed.', 'error');
+      return;
+    }
+    renderValidationResults(data.results || []);
+  } catch (err) {
+    byokValidationPanel.style.display = 'none';
+    showStatus(byokStatusEl, 'Network error: ' + err.message, 'error');
+  } finally {
+    byokValidateBtn.disabled = false;
+    byokValidateSpinner.style.display = 'none';
+  }
+});
+
+byokActivateBtn.addEventListener('click', async () => {
+  showStatus(byokStatusEl, '');
+  const payload = {};
+  const missing = [];
+  for (const [key, fieldId] of Object.entries(BYOK_FIELD_MAP)) {
+    const val = document.getElementById(fieldId).value.trim();
+    if (!val) missing.push(key);
+    else payload[key] = val;
+  }
+  // Admin users must also supply Vertex AI keys
+  if (window.__AP_IS_ADMIN) {
+    for (const [key, fieldId] of Object.entries(BYOK_ADMIN_FIELD_MAP)) {
+      const val = document.getElementById(fieldId).value.trim();
+      if (!val) missing.push(key);
+      else payload[key] = val;
+    }
+  }
+  if (missing.length > 0) {
+    showStatus(byokStatusEl,
+      '⚠ Please fill in all required fields: ' + missing.join(', '),
+      'warn');
+    return;
+  }
+  byokActivateBtn.disabled = true;
+  byokSpinner.style.display = 'inline-block';
+  try {
+    const r = await fetch('/api/porting/byok/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      showStatus(byokStatusEl, data.error || 'Activation failed.', 'error');
+      return;
+    }
+    showStatus(byokStatusEl,
+      '✓ BYOK mode activated! Your API keys are now linked exclusively to your account. ' +
+      'Unlimited access is enabled — usage is billed to your Google Cloud account.',
+      'success');
+    updateByokStatusBadge(true);
+    _detectedByokKeys = null;
+    // Clear input fields for security
+    Object.values(BYOK_FIELD_MAP).forEach(id => { document.getElementById(id).value = ''; });
+    Object.values(BYOK_ADMIN_FIELD_MAP).forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  } catch (err) {
+    showStatus(byokStatusEl, 'Network error: ' + err.message, 'error');
+  } finally {
+    byokActivateBtn.disabled = false;
+    byokSpinner.style.display = 'none';
+  }
+});
+
+byokDeactivateBtn.addEventListener('click', async () => {
+  if (!confirm('Deactivate BYOK mode? Your stored BYOK keys will be removed.')) return;
+  try {
+    const r = await fetch('/api/porting/byok/deactivate', {
+      method: 'DELETE',
+      credentials: 'same-origin',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    });
+    const data = await r.json();
+    if (!r.ok) { showStatus(byokStatusEl, data.error || 'Deactivation failed.', 'error'); return; }
+    showStatus(byokStatusEl, 'BYOK mode deactivated. Your keys have been removed.', 'success');
+    updateByokStatusBadge(false);
+  } catch (err) {
+    showStatus(byokStatusEl, 'Network error: ' + err.message, 'error');
+  }
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function showStatus(el, msg, type = '') {
+  if (!msg) { el.style.display = 'none'; return; }
+  el.textContent = msg;
+  el.className = 'status-msg ' + type;
+}
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Gemini model selector (BYOK users only) ───────────────────────────────────
+const GEMINI_MODEL_WARN_KEY = 'byok_model_warn_suppress';
+const GEMINI_MODELS_META = [
+  { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', cost: 'Lowest',      costClass: 'low',    speed: 'Fastest',  speedClass: 'fast'   },
+  { value: 'gemini-2.5-flash',      label: 'Gemini 2.5 Flash',      cost: 'Low',          costClass: 'low',    speed: 'Fast',     speedClass: 'fast'   },
+  { value: 'gemini-2.5-pro',        label: 'Gemini 2.5 Pro',        cost: 'Medium',       costClass: 'medium', speed: 'Medium',   speedClass: 'medium' },
+  { value: 'gemini-2.0-flash',      label: 'Gemini 2.0 Flash',      cost: 'Low',          costClass: 'low',    speed: 'Fast',     speedClass: 'fast'   },
+  { value: 'gemini-1.5-flash',      label: 'Gemini 1.5 Flash',      cost: 'Low',          costClass: 'low',    speed: 'Fast',     speedClass: 'fast'   },
+  { value: 'gemini-1.5-pro',        label: 'Gemini 1.5 Pro',        cost: 'Medium-High',  costClass: 'high',   speed: 'Slower',   speedClass: 'slow'   },
+];
+
+const modelWarnModal   = document.getElementById('modelWarnModal');
+const modelWarnTitle   = document.getElementById('modelWarnTitle');
+const modelWarnName    = document.getElementById('modelWarnModelName');
+const modelWarnTable   = document.getElementById('modelWarnTable');
+const modelWarnDontShow = document.getElementById('modelWarnDontShow');
+const modelWarnCancel  = document.getElementById('modelWarnCancel');
+const modelWarnConfirm = document.getElementById('modelWarnConfirm');
+const byokModelSelect  = document.getElementById('byokModelSelect');
+const byokModelSaveBtn = document.getElementById('byokModelSaveBtn');
+const byokModelStatusEl = document.getElementById('byokModelStatus');
+
+let _pendingModelSave = null; // model value pending confirmation
+
+async function loadCurrentGeminiModel() {
+  try {
+    const r = await fetch('/user/gemini-model', { credentials: 'same-origin' });
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.model && byokModelSelect) {
+      byokModelSelect.value = d.model;
+    }
+  } catch (_) {}
+}
+
+function _buildModelWarnTable(selectedValue) {
+  const tbody = modelWarnTable.querySelector('tbody');
+  tbody.innerHTML = '';
+  for (const m of GEMINI_MODELS_META) {
+    const tr = document.createElement('tr');
+    if (m.value === selectedValue) tr.classList.add('selected-model');
+    tr.innerHTML =
+      `<td>${escHtml(m.label)}${m.value === selectedValue ? ' ✓' : ''}</td>` +
+      `<td><span class="cost-dot cost-${m.costClass}"></span>${escHtml(m.cost)}</td>` +
+      `<td class="speed-${m.speedClass}">${escHtml(m.speed)}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+async function _doSaveModel(modelValue) {
+  if (byokModelSaveBtn) { byokModelSaveBtn.disabled = true; }
+  try {
+    const r = await fetch('/user/gemini-model', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ model: modelValue }),
+    });
+    if (!r.ok) {
+      let errMsg = 'Failed to save model.';
+      try { const d = await r.json(); errMsg = d.error || errMsg; } catch (_) {}
+      showStatus(byokModelStatusEl, errMsg, 'error');
+    } else {
+      const d = await r.json();
+      const meta = GEMINI_MODELS_META.find(m => m.value === modelValue);
+      showStatus(byokModelStatusEl,
+        '✓ Gemini model saved: ' + (meta ? meta.label : modelValue) + '. All AI operations will use this model.',
+        'success');
+    }
+  } catch (err) {
+    showStatus(byokModelStatusEl, 'Network error: ' + err.message, 'error');
+  } finally {
+    if (byokModelSaveBtn) byokModelSaveBtn.disabled = false;
+  }
+}
+
+if (byokModelSaveBtn) {
+  byokModelSaveBtn.addEventListener('click', () => {
+    const val = byokModelSelect ? byokModelSelect.value : '';
+    if (!val) return;
+    showStatus(byokModelStatusEl, '');
+    // Skip warning if suppressed
+    const suppress = localStorage.getItem(GEMINI_MODEL_WARN_KEY) === '1';
+    if (suppress) {
+      _doSaveModel(val);
+      return;
+    }
+    // Show warning modal
+    _pendingModelSave = val;
+    const meta = GEMINI_MODELS_META.find(m => m.value === val);
+    modelWarnName.textContent = meta ? meta.label : val;
+    _buildModelWarnTable(val);
+    modelWarnDontShow.checked = false;
+    modelWarnModal.classList.remove('hidden');
+  });
+}
+
+if (modelWarnCancel) {
+  modelWarnCancel.addEventListener('click', () => {
+    modelWarnModal.classList.add('hidden');
+    _pendingModelSave = null;
+  });
+}
+if (modelWarnModal) {
+  modelWarnModal.addEventListener('click', e => {
+    if (e.target === modelWarnModal) modelWarnCancel.click();
+  });
+}
+if (modelWarnConfirm) {
+  modelWarnConfirm.addEventListener('click', async () => {
+    if (modelWarnDontShow.checked) {
+      try { localStorage.setItem(GEMINI_MODEL_WARN_KEY, '1'); } catch (_) {}
+    }
+    modelWarnModal.classList.add('hidden');
+    if (_pendingModelSave) {
+      await _doSaveModel(_pendingModelSave);
+      _pendingModelSave = null;
+    }
+  });
+}
+</script>
+
+<script>
+'use strict';
+// ── Option A / B selector ──────────────────────────────────────────────────
+function _selectOption(opt) {
+  const btnA = document.getElementById('optSelectA');
+  const btnB = document.getElementById('optSelectB');
+  const grid = document.getElementById('uploadGrid');
+  const colA = document.getElementById('optionAContent');
+  const colB = document.getElementById('optionBContent');
+  const submitBtn = document.getElementById('submitBtn');
+
+  btnA.classList.toggle('selected', opt === 'A');
+  btnB.classList.toggle('selected', opt === 'B');
+  grid.style.display = '';
+
+  if (opt === 'A') {
+    colA.classList.add('visible');
+    colB.classList.remove('visible');
+    if (submitBtn) submitBtn.style.display = 'none';
+    // Show/hide the OR divider and re-layout as single column
+    const orCol = grid.querySelector('.or-col');
+    if (orCol) orCol.style.display = 'none';
+    grid.style.gridTemplateColumns = '1fr';
+  } else {
+    colB.classList.add('visible');
+    colA.classList.remove('visible');
+    if (submitBtn) { submitBtn.style.display = ''; submitBtn.classList.add('visible'); }
+    const orCol = grid.querySelector('.or-col');
+    if (orCol) orCol.style.display = 'none';
+    grid.style.gridTemplateColumns = '1fr';
+  }
+}
+// Auto-select if a config is already active (done after status load in initSvcConfig)
+window._selectOptionIfActive = function(opt) { _selectOption(opt); };
+</script>
+
+<script>
+'use strict';
+// ── User Service Config tab ───────────────────────────────────────────────────
+(function initSvcConfig() {
+  const svcStatusBadge    = document.getElementById('svcStatusBadge');
+  const svcStatusDot      = document.getElementById('svcStatusDot');
+  const svcStatusText     = document.getElementById('svcStatusText');
+  const svcValidateBtn    = document.getElementById('svcValidateBtn');
+  const svcValidateSpinner = document.getElementById('svcValidateSpinner');
+  const svcActivateBtn    = document.getElementById('svcActivateBtn');
+  const svcActivateSpinner = document.getElementById('svcActivateSpinner');
+  const svcDeactivateBtn  = document.getElementById('svcDeactivateBtn');
+  const svcStatusEl       = document.getElementById('svcStatus');
+  const svcValidationPanel = document.getElementById('svcValidationPanel');
+  const svcValidationSteps = document.getElementById('svcValidationSteps');
+
+  // Track selected providers
+  const _svcSelection = { search: 'google_cse', llm: 'gemini', email: 'default' };
+  let _svcValidated = false;
+
+  // Pill group toggle logic
+  document.querySelectorAll('.svc-pills').forEach(group => {
+    group.addEventListener('click', e => {
+      const pill = e.target.closest('.svc-pill');
+      if (!pill) return;
+      const svc = pill.dataset.svc;
+      const provider = pill.dataset.provider;
+      group.querySelectorAll('.svc-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      _svcSelection[svc] = provider;
+      _svcValidated = false;
+      svcActivateBtn.disabled = true;
+      _updateSvcKeyFields(svc, provider);
+    });
+  });
+
+  function _updateSvcKeyFields(svc, provider) {
+    if (svc === 'search') {
+      document.getElementById('svc-serper-field').style.display   = provider === 'serper'     ? '' : 'none';
+      document.getElementById('svc-dfs-login-field').style.display = provider === 'dataforseo' ? '' : 'none';
+      document.getElementById('svc-dfs-pass-field').style.display  = provider === 'dataforseo' ? '' : 'none';
+    } else if (svc === 'llm') {
+      document.getElementById('svc-openai-field').style.display    = provider === 'openai'     ? '' : 'none';
+      document.getElementById('svc-anthropic-field').style.display = provider === 'anthropic'  ? '' : 'none';
+    } else if (svc === 'email') {
+      document.getElementById('svc-nb-field').style.display      = provider === 'neverbounce' ? '' : 'none';
+      document.getElementById('svc-zb-field').style.display      = provider === 'zerobounce'  ? '' : 'none';
+      document.getElementById('svc-bouncer-field').style.display = provider === 'bouncer'     ? '' : 'none';
+    }
+  }
+
+  function _buildSvcPayload() {
+    const payload = {
+      search: { provider: _svcSelection.search },
+      llm:    { provider: _svcSelection.llm },
+      email_verif: { provider: _svcSelection.email },
+    };
+    if (_svcSelection.search === 'serper') {
+      payload.search.SERPER_API_KEY = (document.getElementById('svc_serper_key').value || '').trim();
+    }
+    if (_svcSelection.search === 'dataforseo') {
+      payload.search.DATAFORSEO_LOGIN    = (document.getElementById('svc_dfs_login').value || '').trim();
+      payload.search.DATAFORSEO_PASSWORD = (document.getElementById('svc_dfs_pass').value || '').trim();
+    }
+    if (_svcSelection.llm === 'openai') {
+      payload.llm.OPENAI_API_KEY = (document.getElementById('svc_openai_key').value || '').trim();
+    }
+    if (_svcSelection.llm === 'anthropic') {
+      payload.llm.ANTHROPIC_API_KEY = (document.getElementById('svc_anthropic_key').value || '').trim();
+    }
+    if (_svcSelection.email === 'neverbounce') {
+      payload.email_verif.NEVERBOUNCE_API_KEY = (document.getElementById('svc_neverbounce_key').value || '').trim();
+    }
+    if (_svcSelection.email === 'zerobounce') {
+      payload.email_verif.ZEROBOUNCE_API_KEY = (document.getElementById('svc_zerobounce_key').value || '').trim();
+    }
+    if (_svcSelection.email === 'bouncer') {
+      payload.email_verif.BOUNCER_API_KEY = (document.getElementById('svc_bouncer_key').value || '').trim();
+    }
+    return payload;
+  }
+
+  function _renderSvcStep(result) {
+    const icons = { ok: '✅', warn: '⚠️', error: '❌', checking: '⏳' };
+    const div = document.createElement('div');
+    div.className = 'byok-vstep ' + (result.status || 'checking');
+    div.innerHTML =
+      `<div class="byok-vstep-icon">${icons[result.status] || '⏳'}</div>` +
+      `<div class="byok-vstep-content">` +
+        `<div class="byok-vstep-label">${escHtml(result.label || '')}</div>` +
+        `<div class="byok-vstep-detail">${escHtml(result.detail || '')}</div>` +
+      `</div>`;
+    return div;
+  }
+
+  function _updateSvcStatusBadge(active) {
+    if (!svcStatusBadge) return;
+    svcStatusBadge.style.display = '';
+    svcStatusBadge.className = 'byok-status-badge ' + (active ? 'active' : 'inactive');
+    svcStatusDot.textContent = '⬤';
+    svcStatusText.textContent = active ? 'Service Config Active' : 'Service Config Inactive';
+    svcDeactivateBtn.style.display = active ? '' : 'none';
+  }
+
+  // Load current status on page load
+  async function _loadSvcStatus() {
+    try {
+      const r = await fetch('/api/user-service-config/status', {
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      _updateSvcStatusBadge(d.active);
+      if (d.active && d.providers) {
+        // Restore pill selections from saved config and auto-select Option A
+        if (window._selectOptionIfActive) window._selectOptionIfActive('A');
+        for (const [svc, providerKey] of [['search', 'search'], ['llm', 'llm'], ['email', 'email_verif']]) {
+          const p = d.providers[providerKey];
+          if (p) {
+            _svcSelection[svc] = p;
+            const pillGroup = document.getElementById('svc-' + svc + '-pills');
+            if (pillGroup) {
+              pillGroup.querySelectorAll('.svc-pill').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.provider === p);
+              });
+            }
+            _updateSvcKeyFields(svc, p);
+          }
+        }
+      }
+    } catch (_) {}
+  }
+  _loadSvcStatus();
+
+  // Validate button
+  svcValidateBtn.addEventListener('click', async () => {
+    showStatus(svcStatusEl, '');
+    svcValidationPanel.style.display = '';
+    svcValidationSteps.innerHTML = '';
+    svcValidateBtn.disabled = true;
+    svcValidateSpinner.style.display = '';
+    _svcValidated = false;
+    svcActivateBtn.disabled = true;
+    try {
+      const r = await fetch('/api/user-service-config/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin',
+        body: JSON.stringify(_buildSvcPayload()),
+      });
+      const d = await r.json();
+      svcValidationSteps.innerHTML = '';
+      if (!r.ok) {
+        showStatus(svcStatusEl, d.error || 'Validation failed.', 'error');
+        return;
+      }
+      (d.results || []).forEach(result => {
+        svcValidationSteps.appendChild(_renderSvcStep(result));
+      });
+      const hasError = (d.results || []).some(r => r.status === 'error');
+      if (!hasError) {
+        _svcValidated = true;
+        svcActivateBtn.disabled = false;
+        showStatus(svcStatusEl, '✓ Validation passed — click Activate to save your configuration.', 'success');
+      } else {
+        showStatus(svcStatusEl, '⚠ One or more checks failed. Fix the errors and try again.', 'error');
+      }
+    } catch (err) {
+      showStatus(svcStatusEl, 'Network error: ' + err.message, 'error');
+    } finally {
+      svcValidateBtn.disabled = false;
+      svcValidateSpinner.style.display = 'none';
+    }
+  });
+
+  // Activate button
+  svcActivateBtn.addEventListener('click', async () => {
+    if (!_svcValidated) return;
+    showStatus(svcStatusEl, '');
+    svcActivateBtn.disabled = true;
+    svcActivateSpinner.style.display = '';
+    let activationSucceeded = false;
+    try {
+      const r = await fetch('/api/user-service-config/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin',
+        body: JSON.stringify(_buildSvcPayload()),
+      });
+      const d = await r.json();
+      if (!r.ok) {
+        showStatus(svcStatusEl, d.error || 'Activation failed.', 'error');
+        return;
+      }
+      activationSucceeded = true;
+      showStatus(svcStatusEl, '✓ Service configuration activated and encrypted.', 'success');
+      _updateSvcStatusBadge(true);
+      _svcValidated = false;
+      // svcActivateBtn stays disabled until deactivation
+    } catch (err) {
+      showStatus(svcStatusEl, 'Network error: ' + err.message, 'error');
+    } finally {
+      if (!activationSucceeded) {
+        svcActivateBtn.disabled = false; // re-enable only on failure so user can retry
+      }
+      svcActivateSpinner.style.display = 'none';
+    }
+  });
+
+  // Deactivate button
+  svcDeactivateBtn.addEventListener('click', async () => {
+    showStatus(svcStatusEl, '');
+    svcDeactivateBtn.disabled = true;
+    try {
+      const r = await fetch('/api/user-service-config/deactivate', {
+        method: 'DELETE',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin',
+      });
+      const d = await r.json();
+      if (!r.ok) {
+        showStatus(svcStatusEl, d.error || 'Deactivation failed.', 'error');
+        return;
+      }
+      showStatus(svcStatusEl, '✓ Service configuration removed. Platform defaults are now active.', 'success');
+      _updateSvcStatusBadge(false);
+      _svcValidated = false;
+      svcActivateBtn.disabled = true;
+      svcValidationPanel.style.display = 'none';
+    } catch (err) {
+      showStatus(svcStatusEl, 'Network error: ' + err.message, 'error');
+    } finally {
+      svcDeactivateBtn.disabled = false;
+    }
+  });
+}());
+</script>
+</body>
+</html>

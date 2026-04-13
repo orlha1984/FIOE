@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Sales Rep Dashboard – FIOE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       FIOE colour palette — all six colours
+       Black Beauty  #222529  → page background, header
+       Azure Dragon  #073679  → headings, stat cards, row hover
+       Cool Blue     #4c82b8  → borders, labels, section bars
+       Robin's Egg   #6deaf9  → accents, badge, active states
+       Argent        #87888a  → muted text, dividers
+       Desired Dawn  #d8d8d8  → body text, table headers
+    ============================================================ */
+    :root {
+      --bb:      #222529;
+      --ad:      #073679;
+      --cb:      #4c82b8;
+      --re:      #6deaf9;
+      --arg:     #87888a;
+      --dd:      #d8d8d8;
+      --panel:   rgba(255,255,255,0.04);
+      --panel2:  rgba(7,54,121,0.30);
+      --border:  rgba(76,130,184,0.25);
+      --danger:  #e05252;
+      --success: #3ecf8e;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bb);
+      color: var(--dd);
+      font-family: "Roboto Condensed", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Top banner ──────────────────────────────────────────── */
+    .top-banner {
+      background: linear-gradient(90deg, var(--ad) 0%, rgba(76,130,184,0.55) 100%);
+      border-bottom: 2px solid rgba(109,234,249,0.25);
+      padding: 0 28px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .banner-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .banner-logo img { height: 20px; width: auto; }
+    .banner-info { display: flex; flex-direction: column; gap: 1px; }
+    .banner-welcome {
+      font-family: "Orbitron", "Roboto Condensed", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      color: #fff;
+    }
+    .banner-welcome .name-hl { color: var(--re); }
+    .banner-username {
+      font-size: 12px;
+      color: var(--dd);
+      opacity: 0.75;
+      letter-spacing: 0.2px;
+    }
+    .banner-right { display: flex; align-items: center; gap: 10px; }
+    .btn-logout {
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(109,234,249,0.30);
+      color: var(--dd);
+      padding: 6px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: "Roboto Condensed", sans-serif;
+      letter-spacing: 0.5px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .btn-logout:hover {
+      background: rgba(109,234,249,0.14);
+      border-color: var(--re);
+      color: var(--re);
+    }
+
+    /* ── Light theme overrides — FIOE dawn palette (matches LookerDashboard FIOE theme) ── */
+    :root[data-theme="light"] {
+      --bb:     #ffffff;            /* White — page background (LookerDashboard --bg-body) */
+      --panel:  #ebebeb;            /* Lighter Desired Dawn — card/tile bg (LookerDashboard --bg-card) */
+      --panel2: #ebebeb;            /* Same for secondary panels */
+      --border: #87888a;            /* Argent — subtle borders */
+      --dd:     #222529;            /* Black Beauty — strong text contrast */
+      --arg:    #073679;            /* Azure Dragon — sub-labels/headings */
+      --cb:     #4c82b8;            /* Cool Blue — borders, section labels */
+      --re:     #6deaf9;            /* Robin's Egg — accent stays the same */
+      --danger:  #c62828;
+      --success: #1b7e4c;
+    }
+    :root[data-theme="light"] body {
+      background: #ffffff;
+      color: #222529;
+    }
+    :root[data-theme="light"] .top-banner {
+      background: linear-gradient(90deg,#073679 0%,#4c82b8 100%);
+    }
+    :root[data-theme="light"] .stat-card {
+      background: #ebebeb;
+      border-color: #87888a;
+      border-left-color: #4c82b8;
+    }
+    :root[data-theme="light"] .stat-card .stat-label { color: #073679; }
+    :root[data-theme="light"] .stat-card .stat-value { color: #073679; }
+    :root[data-theme="light"] .section-heading { color: #4c82b8; }
+    :root[data-theme="light"] .card {
+      background: #ebebeb;
+      border-color: #87888a;
+    }
+    :root[data-theme="light"] thead th {
+      background: rgba(7,54,121,0.15);
+      color: #073679;
+    }
+    :root[data-theme="light"] tbody tr { border-bottom-color: rgba(135,136,138,0.25); }
+    :root[data-theme="light"] tbody tr:hover { background: rgba(7,54,121,0.07); }
+    :root[data-theme="light"] td { color: #222529; }
+    :root[data-theme="light"] td.muted { color: #073679; }
+    :root[data-theme="light"] .subtab-bar {
+      background: rgba(7,54,121,0.08);
+      border-bottom-color: #4c82b8;
+    }
+    :root[data-theme="light"] .subtab-bar button { color: #073679; }
+    :root[data-theme="light"] .subtab-bar button.active {
+      color: #073679;
+      border-bottom-color: #073679;
+      background: rgba(7,54,121,0.10);
+    }
+    :root[data-theme="light"] .txn-counters { border-bottom-color: #87888a; }
+    :root[data-theme="light"] .txn-counter { border-right-color: #87888a; }
+    :root[data-theme="light"] .txn-counter .clbl { color: #073679; }
+    :root[data-theme="light"] .charts-section {
+      background: #ebebeb;
+      border-color: #87888a;
+    }
+    :root[data-theme="light"] .chart-wrap {
+      background: #ffffff;
+      border-color: #87888a;
+    }
+
+    /* Theme select in banner */
+    .theme-select {
+      appearance: none;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(109,234,249,0.30);
+      color: #fff;
+      padding: 5px 26px 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: "Roboto Condensed", sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.4px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236deaf9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      transition: border-color 0.15s;
+    }
+    .theme-select:hover { border-color: var(--re); }
+    .theme-select option { background: #073679; color: #fff; }
+    :root[data-theme="light"] .theme-select {
+      background-color: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    /* Banner username stays white in light mode — banner bg remains dark blue gradient */
+    :root[data-theme="light"] .banner-username { color: #d8d8d8; opacity: 0.92; }
+    :root[data-theme="light"] .banner-welcome  { color: #fff; }
+    :root[data-theme="light"] .btn-logout      { color: #fff; border-color: rgba(216,216,216,0.5); }
+
+    /* ── Page body — full width to match other frontend pages ── */
+    .page-body { padding: 28px 32px 0; width: 100%; box-sizing: border-box; }
+    .page-body--bot { padding: 28px 32px 52px; width: 100%; box-sizing: border-box; }
+
+    /* ── Full-width Charts section ───────────────────────────── */
+    .charts-section {
+      width: 100%;
+      background: var(--panel2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 32px 32px;
+      margin-bottom: 0;
+      box-sizing: border-box;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      width: 100%;
+    }
+    @media (max-width: 1024px) {
+      .charts-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    .chart-wrap {
+      min-width: 0;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 16px 14px;
+    }
+    .chart-wrap .chart-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--cb);
+      color: var(--re);
+    }
+    :root[data-theme="light"] .chart-wrap .chart-title { color: var(--ad); }
+    .chart-wrap .chart-svg-wrap { overflow-x: auto; width: 100%; }
+
+    /* ── Stats row ───────────────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--re);
+      border-radius: 10px;
+      padding: 18px 20px 14px;
+    }
+    .stat-card .stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--arg);
+      margin-bottom: 8px;
+    }
+    .stat-card .stat-value {
+      font-family: "Orbitron", sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--re);
+      line-height: 1;
+    }
+
+    /* ── Section headings ────────────────────────────────────── */
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "Orbitron", "Roboto Condensed", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--cb);
+      margin-bottom: 14px;
+    }
+    .section-heading::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Card panel ──────────────────────────────────────────── */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    /* ── Table ───────────────────────────────────────────────── */
+    .tbl-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: rgba(7,54,121,0.55);
+      color: var(--dd);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(76,130,184,0.10);
+      transition: background 0.12s;
+    }
+    tbody tr:hover { background: rgba(7,54,121,0.18); }
+    tbody tr:last-child { border-bottom: none; }
+    td {
+      padding: 9px 14px;
+      color: var(--dd);
+      vertical-align: middle;
+    }
+    td.muted { color: var(--arg); font-size: 12px; }
+    td .corp-badge {
+      display: inline-block;
+      background: rgba(109,234,249,0.10);
+      border: 1px solid rgba(109,234,249,0.25);
+      color: var(--re);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+    td .type-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    td .type-badge.credit {
+      background: rgba(62,207,142,0.12);
+      color: var(--success);
+      border: 1px solid rgba(62,207,142,0.25);
+    }
+    td .type-badge.deduct {
+      background: rgba(224,82,82,0.12);
+      color: var(--danger);
+      border: 1px solid rgba(224,82,82,0.25);
+    }
+    td .type-badge.other {
+      background: rgba(135,136,138,0.10);
+      color: var(--arg);
+      border: 1px solid rgba(135,136,138,0.20);
+    }
+
+    /* ── Empty & loading states ──────────────────────────────── */
+    .state-row td {
+      text-align: center;
+      padding: 32px 14px;
+      color: var(--arg);
+      font-size: 13px;
+    }
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(109,234,249,0.20);
+      border-top-color: var(--re);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Global error banner ─────────────────────────────────── */
+    #globalError {
+      display: none;
+      background: rgba(224,82,82,0.12);
+      border: 1px solid rgba(224,82,82,0.30);
+      color: var(--danger);
+      border-radius: 8px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    /* ── Sub-tab bar ──────────────────────────────────────────── */
+    .subtab-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--cb);
+      padding: 0 16px;
+      background: rgba(7,54,121,0.20);
+    }
+    .subtab-bar button {
+      padding: 10px 18px;
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      border-bottom: 3px solid transparent;
+      background: transparent;
+      color: var(--arg);
+      cursor: pointer;
+      border-radius: 4px 4px 0 0;
+      transition: all .15s;
+      font-family: "Roboto Condensed", sans-serif;
+      letter-spacing: 0.3px;
+      margin-bottom: -2px;
+    }
+    .subtab-bar button.active {
+      font-weight: 700;
+      border-bottom-color: var(--re);
+      color: var(--dd);
+      background: rgba(109,234,249,0.06);
+    }
+    .subtab-bar button:hover:not(.active) {
+      color: var(--dd);
+      background: rgba(109,234,249,0.03);
+    }
+
+    /* ── Transaction summary counters ────────────────────────── */
+    .txn-counters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .txn-counter {
+      flex: 1;
+      min-width: 150px;
+      padding: 14px 18px;
+      border-right: 1px solid var(--border);
+    }
+    .txn-counter:last-child { border-right: none; }
+    .txn-counter .cval {
+      font-family: "Orbitron", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .txn-counter .clbl {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--arg);
+    }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .top-banner { padding: 0 14px; }
+      .page-body { padding: 16px 14px 0; }
+      .page-body--bot { padding: 16px 14px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Top Banner ──────────────────────────────────────── -->
+  <div class="top-banner">
+    <div class="banner-left">
+      <div class="banner-logo"><img src="/fioe-logo.svg" alt="FIOE"/></div>
+      <div class="banner-info">
+        <div class="banner-welcome">Welcome, <span class="name-hl" id="bannerName">…</span></div>
+        <div class="banner-username" id="bannerUsername">@…</div>
+      </div>
+    </div>
+    <div class="banner-right">
+      <select id="themeSelect" class="theme-select" title="Switch theme">
+        <option value="dark">🌙 Dark</option>
+        <option value="light" selected>☀️ Light</option>
+      </select>
+      <button class="btn-logout" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+
+  <!-- ── Page body ────────────────────────────────────────── -->
+  <div class="page-body">
+
+    <div id="globalError"></div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Clients</div>
+        <div class="stat-value" id="statClients">–</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Credit Transactions</div>
+        <div class="stat-value" id="statCredits">–</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">All Transactions</div>
+        <div class="stat-value" id="statTxns">–</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Credit Spent Revenue</div>
+        <div class="stat-value" style="font-size:18px" id="statRevenue">–</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Monthly Payable</div>
+        <div class="stat-value" style="font-size:18px;color:var(--re)" id="statMonthlyPayable">–</div>
+        <div class="stat-sub" id="statMonthlyPayableSub" style="font-size:11px;color:var(--arg);margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <!-- My Clients + Client Lookup — combined row -->
+    <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;">
+
+      <!-- My Clients (left, grows) -->
+      <div style="flex:0 0 66.666667%;max-width:66.666667%;min-width:0;">
+        <div class="section-heading">My Clients</div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table id="clientTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Client (Corporation)</th>
+                  <th>Username</th>
+                  <th>Last Credited Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="clientBody">
+                <tr class="state-row"><td colspan="5"><span class="spinner"></span>Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Lookup (right, fixed width) -->
+      <div style="flex:0 0 32.5%;max-width:32.5%;">
+        <div class="section-heading">Client Lookup</div>
+        <div class="card" style="padding:20px;">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <input type="text" id="clientCheckInput" placeholder="Enter corporation name…"
+                style="flex:1 1 160px;min-width:140px;padding:9px 14px;border:1.5px solid var(--cb);border-radius:8px;font-size:14px;font-family:'Roboto Condensed',sans-serif;color:var(--dd);background:var(--panel);outline:none;" />
+              <button id="clientCheckBtn" onclick="checkClientExists()"
+                style="padding:9px 18px;background:#073679;color:#fff;border:none;border-radius:8px;font-family:'Roboto Condensed',sans-serif;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;">
+                Check
+              </button>
+            </div>
+            <span id="clientCheckResult" style="font-size:13px;font-weight:600;display:none;padding:7px 14px;border-radius:6px;"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /.page-body -->
+
+  <!-- Financial / Credits — Charts (full-width) -->
+  <div class="charts-section">
+    <div class="section-heading">Financial / Credits — Charts</div>
+
+    <!-- Date-range filter bar -->
+    <div id="chartFilterBar" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;">
+      <label style="font-size:12px;color:var(--arg);font-weight:600;letter-spacing:0.4px;">FROM</label>
+      <input type="date" id="chartFromDate" style="background:var(--panel);border:1px solid var(--border);color:var(--dd);padding:5px 8px;border-radius:5px;font-size:12px;cursor:pointer;">
+      <label style="font-size:12px;color:var(--arg);font-weight:600;letter-spacing:0.4px;">TO</label>
+      <input type="date" id="chartToDate" style="background:var(--panel);border:1px solid var(--border);color:var(--dd);padding:5px 8px;border-radius:5px;font-size:12px;cursor:pointer;">
+      <button onclick="applyChartFilter(this)" style="background:var(--ad);color:#fff;border:none;padding:5px 14px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.4px;">Apply</button>
+      <button id="cqBtn1"  onclick="setChartQuick(1,this)"  class="cq-btn" style="background:var(--panel);color:var(--cb);border:1px solid var(--border);padding:5px 12px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;">Last 24h</button>
+      <button id="cqBtn7"  onclick="setChartQuick(7,this)"  class="cq-btn" style="background:var(--panel);color:var(--cb);border:1px solid var(--border);padding:5px 12px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;">Last 7 Days</button>
+      <button id="cqBtn30" onclick="setChartQuick(30,this)" class="cq-btn" style="background:var(--panel);color:var(--cb);border:1px solid var(--border);padding:5px 12px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;">Last 30 Days</button>
+      <button id="cqBtnAll" onclick="resetChartFilter(this)" class="cq-btn" style="background:var(--panel);color:var(--cb);border:1px solid var(--border);padding:5px 12px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;">All</button>
+    </div>
+
+    <div id="financialChartsArea" class="charts-grid"></div>
+    <div id="financialChartsEmpty" style="color:var(--arg);font-size:13px;display:none;padding:8px 0;">No transaction data available to chart.</div>
+  </div>
+
+  <div class="page-body page-body--bot">
+
+    <!-- Transaction Logs (sub-tabs rendered by JS) -->
+    <div class="section-heading">Transaction Logs</div>
+    <div class="card" id="txnCard" style="padding:0;overflow:visible;"></div>
+
+  </div><!-- /.page-body--bot -->
+
+  <script>
+    // ── Helpers ──────────────────────────────────────────────
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+    }
+    function fmtDate(ts) {
+      if (!ts) return '<span style="color:var(--arg)">—</span>';
+      try {
+        const d = new Date(ts);
+        if (isNaN(d)) return esc(ts);
+        return d.toLocaleString('en-SG', { dateStyle:'medium', timeStyle:'short' });
+      } catch(_) { return esc(ts); }
+    }
+    function getCookie(name) {
+      const m = document.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'='));
+      return m ? decodeURIComponent(m.slice(name.length+1)) : '';
+    }
+    function showError(msg) {
+      const el = document.getElementById('globalError');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    // ── Banner population ────────────────────────────────────
+    const empUsername = getCookie('emp_username');
+    const empFullName = getCookie('emp_full_name');
+    if (!empUsername) {
+      window.location.href = '/sales_rep_register.html';
+    }
+    document.getElementById('bannerName').textContent     = empFullName || empUsername || '…';
+    document.getElementById('bannerUsername').textContent = '@' + (empUsername || '…');
+
+    // ── Log out ──────────────────────────────────────────────
+    document.getElementById('logoutBtn').addEventListener('click', async function() {
+      try {
+        await fetch('/employee/logout', {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin'
+        });
+      } catch(_) {}
+      document.cookie = 'emp_username=; path=/; max-age=0';
+      document.cookie = 'emp_full_name=; path=/; max-age=0';
+      window.location.href = '/sales_rep_register.html';
+    });
+
+    // ── Transaction section state ─────────────────────────────
+    let _txnSubTab = 'transactions';
+    let _allTxns   = [];
+
+    // ── Load dashboard data ──────────────────────────────────
+    async function loadDashboard() {
+      try {
+        const resp = await fetch('/employee/dashboard-data', {
+          credentials: 'same-origin',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (resp.status === 401) {
+          window.location.href = '/sales_rep_register.html';
+          return;
+        }
+        if (!resp.ok) {
+          const d = await resp.json().catch(() => ({}));
+          showError(d.error || 'Failed to load dashboard data.');
+          renderClientTable([]);
+          renderTxnSection([]);
+          return;
+        }
+        const data = await resp.json();
+
+        if (data.employee) {
+          document.getElementById('bannerName').textContent     = data.employee.full_name || empUsername;
+          document.getElementById('bannerUsername').textContent = '@' + (data.employee.username || empUsername);
+        }
+
+        const clients    = data.clients      || [];
+        const txns       = data.transactions || [];
+        const creditTxns = txns.filter(t => (t.transaction_type || '').toLowerCase() === 'credit');
+        const spendTxns  = txns.filter(t => (t.transaction_type || '').toLowerCase() === 'spend');
+        const totalRev   = spendTxns.reduce((s, t) => {
+          if (t.revenue_sgd != null) return s + (parseFloat(t.revenue_sgd) || 0);
+          if (t.token_cost_sgd != null) {
+            const a = t.transaction_amount != null
+              ? Math.abs(parseInt(t.transaction_amount, 10) || 0)
+              : (parseInt(t.token_usage, 10) || 0);
+            return s + a * (parseFloat(t.token_cost_sgd) || 0.10);
+          }
+          return s;
+        }, 0);
+
+        // Monthly Payable: commission × current-month credit spent revenue
+        const commission  = parseFloat((data.employee || {}).commission || 0);
+        const ownership   = parseInt((data.employee || {}).ownership  || 0, 10);
+        const now         = new Date();
+        const monthStart  = new Date(now.getFullYear(), now.getMonth(), 1);
+        const monthSpendTxns = spendTxns.filter(t => {
+          const ts = t.timestamp ? new Date(t.timestamp) : null;
+          return ts && ts >= monthStart && ts <= now;
+        });
+        const monthRev = monthSpendTxns.reduce((s, t) => {
+          if (t.revenue_sgd != null) return s + (parseFloat(t.revenue_sgd) || 0);
+          if (t.token_cost_sgd != null) {
+            const a = t.transaction_amount != null
+              ? Math.abs(parseInt(t.transaction_amount, 10) || 0)
+              : (parseInt(t.token_usage, 10) || 0);
+            return s + a * (parseFloat(t.token_cost_sgd) || 0.10);
+          }
+          return s;
+        }, 0);
+        const monthlyPayable = monthRev * commission / 100;
+        const monthName = now.toLocaleString('en-SG', { month: 'long' });
+
+        document.getElementById('statClients').textContent = clients.length;
+        document.getElementById('statCredits').textContent = creditTxns.length;
+        document.getElementById('statTxns').textContent    = txns.length;
+        document.getElementById('statRevenue').textContent = 'SGD ' + totalRev.toFixed(2);
+        document.getElementById('statMonthlyPayable').textContent = 'SGD ' + monthlyPayable.toFixed(2);
+        document.getElementById('statMonthlyPayableSub').textContent =
+          monthName + ' · ' + commission.toFixed(1) + '% of SGD ' + monthRev.toFixed(2);
+
+        renderClientTable(clients, ownership);
+        renderTxnSection(txns);
+        renderFinancialCharts(txns);
+
+      } catch (err) {
+        showError('Network error: ' + err.message);
+        renderClientTable([]);
+        renderTxnSection([]);
+      }
+    }
+
+    // ── My Clients table ─────────────────────────────────────
+    function clientStatusDot(lastCreditedDate, ownershipMonths) {
+      function dotHtml(color, titleAttr) {
+        return `<div style="display:flex;justify-content:flex-start;align-items:flex-start;"><span title="${titleAttr}" style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${color};${color !== '#87888a' ? 'box-shadow:0 0 4px ' + color + '88;' : ''}"></span></div>`;
+      }
+      // ownershipMonths = 0 means no limit set → show neutral grey dot
+      if (!lastCreditedDate || ownershipMonths <= 0) {
+        return dotHtml('#87888a', 'No ownership period set');
+      }
+      const last  = new Date(lastCreditedDate);
+      const now   = new Date();
+      if (isNaN(last.getTime())) {
+        return dotHtml('#87888a', 'Unknown last credit date');
+      }
+      const diffMs      = now - last;
+      const diffDays    = diffMs / (1000 * 60 * 60 * 24);
+      const limitDays   = ownershipMonths * 30.44;
+      const warnDays    = Math.max(limitDays * 0.2, 30);
+      if (diffDays > limitDays) {
+        return dotHtml('#e74c3c', 'Ownership period expired');
+      } else if (diffDays > limitDays - warnDays) {
+        return dotHtml('#f39c12', 'Nearing ownership threshold');
+      } else {
+        return dotHtml('#27ae60', 'Within ownership period');
+      }
+    }
+
+    function renderClientTable(clients, ownershipMonths) {
+      const tbody = document.getElementById('clientBody');
+      if (!clients.length) {
+        tbody.innerHTML = '<tr class="state-row"><td colspan="5">No clients assigned to your account yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = clients.map((c, i) => `
+        <tr>
+          <td class="muted">${i + 1}</td>
+          <td><span class="corp-badge">${esc(c.corporation)}</span></td>
+          <td>${esc(c.username)}</td>
+          <td>${fmtDate(c.last_credited_date)}</td>
+          <td style="text-align:center;">${clientStatusDot(c.last_credited_date, ownershipMonths || 0)}</td>
+        </tr>`).join('');
+    }
+
+    // ── Transaction Logs — sub-tab shell ──────────────────────
+    function renderTxnSection(txns) {
+      _allTxns = txns || [];
+      const card = document.getElementById('txnCard');
+      card.innerHTML = '';
+
+      // Sub-tab bar
+      const tabBar = document.createElement('div');
+      tabBar.className = 'subtab-bar';
+      [['transactions', '📋 Transactions'], ['ledger', '📒 Running Balance']].forEach(([tid, label]) => {
+        const btn = document.createElement('button');
+        btn.textContent = label;
+        if (_txnSubTab === tid) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+          _txnSubTab = tid;
+          renderTxnSection(_allTxns);
+        });
+        tabBar.appendChild(btn);
+      });
+      card.appendChild(tabBar);
+
+      if (_txnSubTab === 'transactions') {
+        renderTxnContent(_allTxns, card);
+      } else {
+        renderRunningBalanceContent(_allTxns, card);
+      }
+    }
+
+    // ── Transactions sub-tab ──────────────────────────────────
+    function renderTxnContent(txns, container) {
+      // Summary counters
+      const totalDeducted = txns
+        .filter(t => (t.transaction_type || '').toLowerCase() === 'spend')
+        .reduce((s, t) => {
+          const a = t.transaction_amount != null
+            ? Math.abs(parseInt(t.transaction_amount, 10) || 0)
+            : (parseInt(t.token_usage, 10) || 0);
+          return s + a;
+        }, 0);
+      const totalCredited = txns
+        .filter(t => (t.transaction_type || '').toLowerCase() === 'credit')
+        .reduce((s, t) => {
+          const a = t.transaction_amount != null
+            ? parseInt(t.transaction_amount, 10) || 0
+            : (parseInt(t.token_usage, 10) || 0);
+          return s + a;
+        }, 0);
+      const totalRevenue = txns
+        .filter(t => (t.transaction_type || '').toLowerCase() === 'spend')
+        .reduce((s, t) => {
+          if (t.revenue_sgd != null) return s + (parseFloat(t.revenue_sgd) || 0);
+          if (t.token_cost_sgd != null) {
+            const a = t.transaction_amount != null
+              ? Math.abs(parseInt(t.transaction_amount, 10) || 0)
+              : (parseInt(t.token_usage, 10) || 0);
+            return s + a * (parseFloat(t.token_cost_sgd) || 0.10);
+          }
+          return s;
+        }, 0);
+
+      const counters = document.createElement('div');
+      counters.className = 'txn-counters';
+      counters.innerHTML = `
+        <div class="txn-counter">
+          <div class="cval" style="color:var(--danger)">${totalDeducted.toLocaleString()}</div>
+          <div class="clbl">Tokens Deducted</div>
+        </div>
+        <div class="txn-counter">
+          <div class="cval" style="color:var(--success)">${totalCredited.toLocaleString()}</div>
+          <div class="clbl">Tokens Credited</div>
+        </div>
+        <div class="txn-counter">
+          <div class="cval" style="color:var(--re)">SGD ${totalRevenue.toFixed(2)}</div>
+          <div class="clbl">Credit Spent Revenue</div>
+        </div>
+        <div class="txn-counter">
+          <div class="cval">${txns.length}</div>
+          <div class="clbl">Total Transactions</div>
+        </div>`;
+      container.appendChild(counters);
+
+      const wrap = document.createElement('div');
+      wrap.className = 'tbl-wrap';
+      if (!txns.length) {
+        wrap.innerHTML = '<div style="padding:32px;text-align:center;color:var(--arg);font-size:13px;">No transaction logs found for your clients.</div>';
+        container.appendChild(wrap);
+        return;
+      }
+
+      const table = document.createElement('table');
+      table.innerHTML = `<thead><tr>
+        <th>Timestamp</th><th>Corporation</th><th>User</th><th>Type</th>
+        <th style="text-align:right">Tokens</th>
+        <th style="text-align:right">Token Cost</th>
+        <th style="text-align:right">Revenue (SGD)</th>
+        <th style="text-align:right">Before → After</th>
+        <th>Feature</th>
+      </tr></thead>`;
+      const tbody = document.createElement('tbody');
+      txns.forEach(t => {
+        const type = (t.transaction_type || '').toLowerCase();
+        const amt  = t.transaction_amount != null
+          ? parseInt(t.transaction_amount, 10) || 0
+          : (t.token_usage != null ? parseInt(t.token_usage, 10) || 0 : 0);
+        const typeColor = type === 'spend'  ? '#d9534f'
+                        : type === 'credit' ? '#27ae60'
+                        : 'var(--arg)';
+        const typeLabel = type === 'spend'  ? '▼ spend'
+                        : type === 'credit' ? '▲ credit'
+                        : (type || '—');
+        const amtDisplay = amt
+          ? `<span style="color:${typeColor};font-weight:600">${type === 'spend' ? '−' : type === 'credit' ? '+' : ''}${Math.abs(amt).toLocaleString()}</span>`
+          : '<span class="muted">—</span>';
+        const before = t.token_before != null ? Number(t.token_before).toLocaleString() : '—';
+        const after  = t.token_after  != null ? Number(t.token_after).toLocaleString()  : '—';
+        const beforeAfter = (before !== '—' || after !== '—') ? `${before} → ${after}` : '—';
+        const costSGD = t.token_cost_sgd != null ? parseFloat(t.token_cost_sgd) : null;
+        const revSGD  = t.revenue_sgd    != null ? parseFloat(t.revenue_sgd)    : null;
+        const costDisplay = (type === 'spend' && costSGD != null)
+          ? `<span class="muted" style="font-size:11px">SGD ${costSGD.toFixed(4)}</span>`
+          : '<span class="muted">—</span>';
+        const revDisplay = (type === 'spend' && revSGD != null && revSGD > 0)
+          ? `<span style="color:var(--re);font-weight:600">SGD ${revSGD.toFixed(4)}</span>`
+          : '<span class="muted">—</span>';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="muted" style="white-space:nowrap">${fmtDate(t.timestamp)}</td>
+          <td><span class="corp-badge">${esc(t.corporation)}</span></td>
+          <td>${esc(t.username)}</td>
+          <td><span style="color:${typeColor};font-size:11px">${esc(typeLabel)}</span></td>
+          <td style="text-align:right">${amtDisplay}</td>
+          <td style="text-align:right">${costDisplay}</td>
+          <td style="text-align:right">${revDisplay}</td>
+          <td style="text-align:right;font-size:11px" class="muted">${esc(beforeAfter)}</td>
+          <td class="muted">${esc(t.feature)}</td>`;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      wrap.appendChild(table);
+      container.appendChild(wrap);
+    }
+
+    // ── Running Balance print helper ──────────────────────────
+    function _printLedger(rows, monthLabel) {
+      let running = 0;
+      const withBal = rows.map(e => {
+        running += (e.debit || 0) - (e.credit || 0);
+        return { ...e, _balance: running };
+      });
+      const title = monthLabel ? 'Running Balance — ' + monthLabel : 'Running Balance — All';
+      const totalDebit  = rows.reduce((s,e) => s + (e.debit  || 0), 0);
+      const totalCredit = rows.reduce((s,e) => s + (e.credit || 0), 0);
+      const closing     = totalDebit - totalCredit;
+      const rowHtml = withBal.map(e => `<tr>
+        <td>${e.date||''}</td>
+        <td>${e.category||''}</td>
+        <td>${e._corp||''}</td>
+        <td style="font-family:monospace;font-size:11px">${e.reference||''}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.description||''}</td>
+        <td style="text-align:right">${e.debit>0?'SGD '+e.debit.toFixed(2):''}</td>
+        <td style="text-align:right">${e.credit>0?'SGD '+e.credit.toFixed(2):''}</td>
+        <td style="text-align:right;font-weight:700">SGD ${e._balance.toFixed(2)}</td>
+        <td>${e.created_by||''}</td>
+      </tr>`).join('');
+      const html = `<!DOCTYPE html><html><head><title>${title}</title>
+      <style>body{font-family:Arial,sans-serif;font-size:12px;color:#222;margin:20px}
+      h2{color:#073679}table{width:100%;border-collapse:collapse}
+      th{background:#073679;color:#fff;padding:6px 8px;text-align:left;font-size:11px}
+      td{padding:5px 8px;border-bottom:1px solid #ddd}
+      .summary{display:flex;gap:24px;margin:12px 0;padding:10px;background:#f5f7fa;border-radius:6px}
+      .summary div{text-align:center}.summary .val{font-size:16px;font-weight:700;color:#073679}
+      .summary .lbl{font-size:10px;color:#555;margin-top:2px}</style></head><body>
+      <h2>${title}</h2>
+      <div class="summary">
+        <div><div class="val">${rows.length}</div><div class="lbl">Entries</div></div>
+        <div><div class="val">SGD ${totalDebit.toFixed(2)}</div><div class="lbl">Total Debit</div></div>
+        <div><div class="val">SGD ${totalCredit.toFixed(2)}</div><div class="lbl">Total Credit</div></div>
+        <div><div class="val">SGD ${closing.toFixed(2)}</div><div class="lbl">Closing Balance</div></div>
+      </div>
+      <table><thead><tr><th>Date</th><th>Category</th><th>Corporation</th><th>Reference</th><th>Description</th>
+      <th>Debit (+)</th><th>Credit (−)</th><th>Balance</th><th>Created By</th></tr></thead>
+      <tbody>${rowHtml}</tbody></table>
+      <script>window.print();<\/script></body></html>`;
+      const w = window.open('', '_blank');
+      if (w) { w.document.write(html); w.document.close(); }
+    }
+
+    // ── Running Balance sub-tab ───────────────────────────────
+    function _toRunningBalance(txns) {
+      return (txns || [])
+        .filter(t => {
+          const tp = (t.transaction_type || '').toLowerCase();
+          return tp === 'spend' || tp === 'credit';
+        })
+        .map(t => {
+          const ts      = t.timestamp || '';
+          const date    = ts.slice(0, 10);
+          const tp      = (t.transaction_type || '').toLowerCase();
+          const amt     = t.transaction_amount != null
+            ? parseFloat(t.transaction_amount) || 0
+            : parseFloat(t.token_usage) || 0;
+          const rev     = parseFloat(t.revenue_sgd) || 0;
+          const costPt  = parseFloat(t.token_cost_sgd) || 0.10;
+          const isSpend = tp === 'spend';
+          const user    = t.username || '';
+          const corp    = t.corporation || '';
+          const value   = rev > 0
+            ? rev
+            : Math.round(Math.abs(amt) * costPt * 10000) / 10000;
+          return {
+            date,
+            category:    isSpend ? 'Revenue' : 'Refund',
+            reference:   'TXN-' + ts.replace(/[^0-9]/g, '').slice(0, 14),
+            description: (corp ? `[${corp}] ` : '') + (t.feature || 'transaction') + ': ' + amt + ' tkn' + (user ? ' by ' + user : ''),
+            debit:       isSpend ? value : 0,
+            credit:      isSpend ? 0 : value,
+            created_by:  user,
+            created_at:  ts,
+            _corp:       corp,
+          };
+        })
+        .sort((a, b) => (a.date || '') > (b.date || '') ? 1 : -1);
+    }
+
+    function renderRunningBalanceContent(txns, container) {
+      const ledgerRows = _toRunningBalance(txns);
+
+      // ── Print controls ──────────────────────────────────────
+      const printBar = document.createElement('div');
+      printBar.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);';
+      printBar.innerHTML = `
+        <label style="font-size:12px;color:var(--arg);font-weight:600;letter-spacing:0.4px;">PRINT MONTH</label>
+        <input type="month" id="printMonthPicker" style="background:var(--panel);border:1px solid var(--border);color:var(--dd);padding:4px 8px;border-radius:5px;font-size:12px;cursor:pointer;">
+        <button id="printRunningBalBtn" style="background:var(--ad);color:#fff;border:none;padding:5px 14px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.4px;">🖨 Print</button>
+        <button id="printAllRunningBalBtn" style="background:var(--panel);color:var(--cb);border:1px solid var(--border);padding:5px 12px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;">Print All</button>`;
+      container.appendChild(printBar);
+      printBar.querySelector('#printRunningBalBtn').addEventListener('click', function() {
+        const monthVal = document.getElementById('printMonthPicker').value; // "YYYY-MM"
+        const rows = monthVal ? ledgerRows.filter(r => (r.date || '').startsWith(monthVal)) : ledgerRows;
+        _printLedger(rows, monthVal);
+      });
+      printBar.querySelector('#printAllRunningBalBtn').addEventListener('click', function() {
+        _printLedger(ledgerRows, null);
+      });
+
+      let running = 0;
+      const withBalance = ledgerRows.map(e => {
+        running += (e.debit || 0) - (e.credit || 0);
+        return { ...e, _balance: running };
+      }).reverse();
+
+      // Summary counters
+      const totalDebit  = ledgerRows.reduce((s, e) => s + (e.debit  || 0), 0);
+      const totalCredit = ledgerRows.reduce((s, e) => s + (e.credit || 0), 0);
+      const closingBal  = totalDebit - totalCredit;
+
+      const summaryDiv = document.createElement('div');
+      summaryDiv.className = 'txn-counters';
+      summaryDiv.innerHTML = `
+        <div class="txn-counter">
+          <div class="cval">${ledgerRows.length}</div>
+          <div class="clbl">Ledger Entries</div>
+        </div>
+        <div class="txn-counter">
+          <div class="cval" style="color:var(--re)">SGD ${totalDebit.toFixed(2)}</div>
+          <div class="clbl">Total Debit (+)</div>
+        </div>
+        <div class="txn-counter">
+          <div class="cval" style="color:var(--danger)">SGD ${totalCredit.toFixed(2)}</div>
+          <div class="clbl">Total Credit (−)</div>
+        </div>
+        <div class="txn-counter">
+          <div class="cval" style="color:${closingBal >= 0 ? 'var(--success)' : 'var(--danger)'}">SGD ${closingBal.toFixed(2)}</div>
+          <div class="clbl">Closing Balance</div>
+        </div>`;
+      container.appendChild(summaryDiv);
+
+      if (!withBalance.length) {
+        const empty = document.createElement('div');
+        empty.style.cssText = 'padding:32px;text-align:center;color:var(--arg);font-size:13px;';
+        empty.textContent = 'No ledger entries to display.';
+        container.appendChild(empty);
+        return;
+      }
+
+      const wrap = document.createElement('div');
+      wrap.className = 'tbl-wrap';
+      const table = document.createElement('table');
+      table.innerHTML = `<thead><tr>
+        <th style="white-space:nowrap">Date</th>
+        <th>Category</th>
+        <th>Corporation</th>
+        <th>Reference</th>
+        <th>Description</th>
+        <th style="text-align:right">Debit (+)</th>
+        <th style="text-align:right">Credit (−)</th>
+        <th style="text-align:right">Balance</th>
+        <th style="white-space:nowrap">Created By</th>
+      </tr></thead>`;
+      const tbody = document.createElement('tbody');
+      withBalance.forEach(e => {
+        const debit  = e.debit  || 0;
+        const credit = e.credit || 0;
+        const bal    = e._balance;
+        const balColor = bal >= 0 ? 'var(--success)' : 'var(--danger)';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="muted" style="white-space:nowrap;font-size:12px">${esc(e.date || '—')}</td>
+          <td><span style="background:rgba(76,130,184,0.12);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--cb)">${esc(e.category || '—')}</span></td>
+          <td><span class="corp-badge">${esc(e._corp || '—')}</span></td>
+          <td style="font-family:monospace;font-size:11px;color:var(--cb)">${esc(e.reference || '—')}</td>
+          <td class="muted" style="font-size:12px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(e.description || '')}">${esc(e.description || '—')}</td>
+          <td style="text-align:right;font-weight:600;color:var(--re)">${debit > 0 ? 'SGD ' + debit.toFixed(2) : '<span class="muted">—</span>'}</td>
+          <td style="text-align:right;font-weight:600;color:var(--danger)">${credit > 0 ? 'SGD ' + credit.toFixed(2) : '<span class="muted">—</span>'}</td>
+          <td style="text-align:right;font-weight:700;color:${balColor}">SGD ${bal.toFixed(2)}</td>
+          <td class="muted" style="font-size:11px;white-space:nowrap">${esc(e.created_by || '—')}<br><span style="font-size:10px">${esc((e.created_at || '').slice(0, 19).replace('T', ' '))}</span></td>`;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      wrap.appendChild(table);
+      container.appendChild(wrap);
+    }
+
+    // ── Client existence check ─────────────────────────────
+    async function checkClientExists() {
+      const input = document.getElementById('clientCheckInput');
+      const result = document.getElementById('clientCheckResult');
+      const corp = (input.value || '').trim();
+      if (!corp) {
+        result.style.cssText = 'font-size:13px;font-weight:600;display:inline-block;padding:7px 14px;border-radius:6px;background:#fff3cd;color:#856404;border:1px solid #ffc107;';
+        result.textContent = 'Please enter a corporation name.';
+        return;
+      }
+      result.style.cssText = 'font-size:13px;font-weight:600;display:inline-block;padding:7px 14px;border-radius:6px;background:rgba(7,54,121,0.12);color:var(--cb);';
+      result.textContent = 'Checking…';
+      try {
+        const resp = await fetch(`/employee/check-client?corporation=${encodeURIComponent(corp)}`, {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin'
+        });
+        if (!resp.ok) throw new Error('Network error');
+        const data = await resp.json();
+        if (data.exists) {
+          result.style.cssText = 'font-size:13px;font-weight:600;display:inline-block;padding:7px 14px;border-radius:6px;background:#d4edda;color:#155724;border:1px solid #c3e6cb;';
+          result.textContent = `✓ Client Exists: ${data.match}`;
+        } else if (data.fuzzy && data.match) {
+          result.style.cssText = 'font-size:13px;font-weight:600;display:inline-block;padding:7px 14px;border-radius:6px;background:#fff3cd;color:#856404;border:1px solid #ffc107;';
+          result.textContent = `Did you mean: ${data.match}?`;
+        } else {
+          result.style.cssText = 'font-size:13px;font-weight:600;display:inline-block;padding:7px 14px;border-radius:6px;background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;';
+          result.textContent = '✗ Client Not Found';
+        }
+      } catch (err) {
+        result.style.cssText = 'font-size:13px;font-weight:600;display:inline-block;padding:7px 14px;border-radius:6px;background:#fff3cd;color:#856404;border:1px solid #ffc107;';
+        result.textContent = 'Error checking client.';
+      }
+    }
+
+    // Allow pressing Enter in the check input
+    document.getElementById('clientCheckInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') checkClientExists();
+    });
+
+    // ── FIOE chart helpers ─────────────────────────────────
+    const _FIOE_CHART_COLORS = ['#073679','#4c82b8','#6deaf9','#87888a','#27ae60','#e67e22','#9b59b6','#e74c3c'];
+
+    function _isLight() { return document.documentElement.dataset.theme === 'light'; }
+    function _chartTextColor()   { return _isLight() ? '#222529' : '#d8d8d8'; }
+    function _chartMutedColor()  { return _isLight() ? '#546075' : '#87888a'; }
+    function _chartGridColor()   { return _isLight() ? 'rgba(7,54,121,0.18)' : 'rgba(216,216,216,0.18)'; }
+
+    function _svgBarChart(data, title, container) {
+      if (!data.length) return;
+      const maxVal = Math.max(...data.map(d => d.value), 1);
+      const textC = _chartTextColor(), mutedC = _chartMutedColor(), gridC = _chartGridColor();
+      const BAR_W = 50, GAP = 18, CHART_H = 140, LABEL_H = 60, PAD_L = 10;
+      const svgW = Math.max(260, data.length * (BAR_W + GAP) + PAD_L * 2);
+      const svgH = CHART_H + LABEL_H;
+      const wrap = document.createElement('div');
+      wrap.className = 'chart-wrap';
+      const ttl = document.createElement('div');
+      ttl.className = 'chart-title';
+      ttl.textContent = title;
+      wrap.appendChild(ttl);
+      const svgWrap = document.createElement('div');
+      svgWrap.className = 'chart-svg-wrap';
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '100%'); svg.setAttribute('height', svgH);
+      svg.setAttribute('viewBox', `0 0 ${svgW} ${svgH}`);
+      svg.style.cssText = 'display:block;min-width:' + svgW + 'px;';
+      const baseline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      baseline.setAttribute('x1', PAD_L); baseline.setAttribute('y1', CHART_H);
+      baseline.setAttribute('x2', svgW - PAD_L); baseline.setAttribute('y2', CHART_H);
+      baseline.setAttribute('stroke', gridC); baseline.setAttribute('stroke-width', '1');
+      svg.appendChild(baseline);
+      data.forEach((d, i) => {
+        const x = PAD_L + i * (BAR_W + GAP);
+        const barH = Math.max(4, Math.round((d.value / maxVal) * (CHART_H - 28)));
+        const barY = CHART_H - barH;
+        const color = d.color || _FIOE_CHART_COLORS[i % _FIOE_CHART_COLORS.length];
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x); rect.setAttribute('y', barY);
+        rect.setAttribute('width', BAR_W); rect.setAttribute('height', barH);
+        rect.setAttribute('rx', '4'); rect.setAttribute('fill', color);
+        svg.appendChild(rect);
+        const hi = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        hi.setAttribute('x', x + 2); hi.setAttribute('y', barY);
+        hi.setAttribute('width', BAR_W - 4); hi.setAttribute('height', Math.min(6, barH));
+        hi.setAttribute('rx', '3'); hi.setAttribute('fill', '#fff'); hi.setAttribute('opacity', '0.18');
+        svg.appendChild(hi);
+        const vlbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        vlbl.setAttribute('x', x + BAR_W / 2); vlbl.setAttribute('y', barY - 6);
+        vlbl.setAttribute('text-anchor', 'middle');
+        vlbl.setAttribute('font-size', '12'); vlbl.setAttribute('fill', textC); vlbl.setAttribute('font-weight', '700');
+        vlbl.textContent = d.value;
+        svg.appendChild(vlbl);
+        const xlbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        const lx = x + BAR_W / 2, ly = CHART_H + 12;
+        xlbl.setAttribute('x', lx); xlbl.setAttribute('y', ly);
+        xlbl.setAttribute('text-anchor', 'end');
+        xlbl.setAttribute('font-size', '11'); xlbl.setAttribute('fill', mutedC);
+        xlbl.setAttribute('transform', `rotate(-40 ${lx} ${ly})`);
+        xlbl.textContent = d.label;
+        svg.appendChild(xlbl);
+      });
+      svgWrap.appendChild(svg);
+      wrap.appendChild(svgWrap);
+      container.appendChild(wrap);
+    }
+
+    function _svgLineChart(data, title, container, color) {
+      if (!data.length) return;
+      color = color || '#4c82b8';
+      const textC = _chartTextColor(), mutedC = _chartMutedColor(), gridC = _chartGridColor();
+      const maxVal = Math.max(...data.map(d => d.value), 1);
+      const PT_W = Math.max(48, Math.min(80, Math.floor(360 / Math.max(data.length, 1))));
+      const CHART_H = 130, LABEL_H = 44, PAD = 14;
+      const svgW = Math.max(280, data.length * PT_W + PAD * 2);
+      const svgH = CHART_H + LABEL_H;
+      const wrap = document.createElement('div');
+      wrap.className = 'chart-wrap';
+      const ttl = document.createElement('div');
+      ttl.className = 'chart-title';
+      ttl.textContent = title;
+      wrap.appendChild(ttl);
+      const svgWrap = document.createElement('div');
+      svgWrap.className = 'chart-svg-wrap';
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '100%'); svg.setAttribute('height', svgH);
+      svg.setAttribute('viewBox', `0 0 ${svgW} ${svgH}`);
+      svg.style.cssText = 'display:block;min-width:' + svgW + 'px;';
+      [0.25, 0.5, 0.75, 1].forEach(frac => {
+        const gy = CHART_H - Math.round(frac * (CHART_H - 20));
+        const gl = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        gl.setAttribute('x1', PAD); gl.setAttribute('y1', gy);
+        gl.setAttribute('x2', svgW - PAD); gl.setAttribute('y2', gy);
+        gl.setAttribute('stroke', gridC); gl.setAttribute('stroke-width', '1'); gl.setAttribute('stroke-dasharray', '4,4');
+        svg.appendChild(gl);
+      });
+      const pts = data.map((d, i) => {
+        const bH = Math.max(4, Math.round((d.value / maxVal) * (CHART_H - 22)));
+        return { x: PAD + i * PT_W + PT_W / 2, y: CHART_H - bH, v: d.value, lbl: d.label };
+      });
+      if (pts.length > 1) {
+        const areaPath = `M${pts[0].x},${CHART_H} ` + pts.map(p => `L${p.x},${p.y}`).join(' ') + ` L${pts[pts.length-1].x},${CHART_H} Z`;
+        const areaEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        areaEl.setAttribute('d', areaPath); areaEl.setAttribute('fill', color); areaEl.setAttribute('opacity', '0.12');
+        svg.appendChild(areaEl);
+        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        poly.setAttribute('points', pts.map(p => `${p.x},${p.y}`).join(' '));
+        poly.setAttribute('fill', 'none'); poly.setAttribute('stroke', color);
+        poly.setAttribute('stroke-width', '2.5'); poly.setAttribute('stroke-linejoin', 'round');
+        svg.appendChild(poly);
+      } else {
+        const refLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        refLine.setAttribute('x1', PAD); refLine.setAttribute('y1', pts[0].y);
+        refLine.setAttribute('x2', svgW - PAD); refLine.setAttribute('y2', pts[0].y);
+        refLine.setAttribute('stroke', color); refLine.setAttribute('stroke-width', '2'); refLine.setAttribute('stroke-dasharray', '6,4');
+        svg.appendChild(refLine);
+      }
+      pts.forEach(p => {
+        const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        ring.setAttribute('cx', p.x); ring.setAttribute('cy', p.y);
+        ring.setAttribute('r', '5'); ring.setAttribute('fill', _isLight() ? '#fff' : '#222529'); ring.setAttribute('stroke', color); ring.setAttribute('stroke-width', '2');
+        svg.appendChild(ring);
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y);
+        dot.setAttribute('r', '2.5'); dot.setAttribute('fill', color);
+        svg.appendChild(dot);
+        const vlbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        vlbl.setAttribute('x', p.x); vlbl.setAttribute('y', p.y - 9);
+        vlbl.setAttribute('text-anchor', 'middle');
+        vlbl.setAttribute('font-size', '11'); vlbl.setAttribute('fill', textC); vlbl.setAttribute('font-weight', '600');
+        vlbl.textContent = p.v;
+        svg.appendChild(vlbl);
+        const xlbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        const ly = CHART_H + 12;
+        xlbl.setAttribute('x', p.x); xlbl.setAttribute('y', ly);
+        xlbl.setAttribute('text-anchor', 'end');
+        xlbl.setAttribute('font-size', '11'); xlbl.setAttribute('fill', mutedC);
+        xlbl.setAttribute('transform', `rotate(-35 ${p.x} ${ly})`);
+        xlbl.textContent = p.lbl;
+        svg.appendChild(xlbl);
+      });
+      svgWrap.appendChild(svg);
+      wrap.appendChild(svgWrap);
+      container.appendChild(wrap);
+    }
+
+    function _svgPieChart(data, title, container) {
+      if (!data.length) return;
+      const total = data.reduce((s, d) => s + d.value, 0);
+      if (!total) return;
+      const textC = _chartTextColor();
+      const COLORS = _FIOE_CHART_COLORS;
+      const R = 66, CX = 82, CY = 80;
+      const SVG_W = 300, SVG_H = 160;
+      const wrap = document.createElement('div');
+      wrap.className = 'chart-wrap';
+      const ttl = document.createElement('div');
+      ttl.className = 'chart-title';
+      ttl.textContent = title;
+      wrap.appendChild(ttl);
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '100%'); svg.setAttribute('height', SVG_H);
+      svg.setAttribute('viewBox', `0 0 ${SVG_W} ${SVG_H}`);
+      svg.style.cssText = 'display:block;min-width:220px;';
+      let startAngle = -Math.PI / 2;
+      data.forEach((d, i) => {
+        const angle = (d.value / total) * 2 * Math.PI;
+        const endAngle = startAngle + angle;
+        const x1 = CX + R * Math.cos(startAngle), y1 = CY + R * Math.sin(startAngle);
+        const x2 = CX + R * Math.cos(endAngle), y2 = CY + R * Math.sin(endAngle);
+        const lg = angle > Math.PI ? 1 : 0;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M${CX},${CY} L${x1},${y1} A${R},${R} 0 ${lg},1 ${x2},${y2} Z`);
+        path.setAttribute('fill', COLORS[i % COLORS.length]);
+        path.setAttribute('stroke', _isLight() ? '#fff' : '#222529'); path.setAttribute('stroke-width', '2');
+        svg.appendChild(path);
+        startAngle = endAngle;
+      });
+      // Legend
+      const LX = 162, LY_START = 16;
+      data.forEach((d, i) => {
+        const ly = LY_START + i * 20;
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', LX); dot.setAttribute('cy', ly + 5);
+        dot.setAttribute('r', '6'); dot.setAttribute('fill', COLORS[i % COLORS.length]);
+        svg.appendChild(dot);
+        const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lbl.setAttribute('x', LX + 12); lbl.setAttribute('y', ly + 10);
+        lbl.setAttribute('font-size', '12'); lbl.setAttribute('fill', textC); lbl.setAttribute('font-weight', '500');
+        lbl.textContent = `${d.label} (${d.value})`;
+        svg.appendChild(lbl);
+      });
+      wrap.appendChild(svg);
+      container.appendChild(wrap);
+    }
+
+    function _featureLabel(raw) {
+      const map = {
+        'jd_upload':'JD Upload','candidate_search':'Candidate Search','token_update':'Token Update',
+        'appeal_approval':'Appeal Approval (Credit)','verified_selection_deduct':'Verified Selection','bulk_assessment':'Bulk Assessment'
+      };
+      if (!raw) return 'Unspecified';
+      return map[raw] || raw.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function renderFinancialCharts(transactions, isFiltered) {
+      if (!isFiltered) {
+        _allTxnsForCharts = transactions || [];
+        // On initial full-data load, mark "All" as the active quick button
+        _setActiveChartBtn(document.getElementById('cqBtnAll'));
+      }
+      const area = document.getElementById('financialChartsArea');
+      const empty = document.getElementById('financialChartsEmpty');
+      if (!area) return;
+      area.innerHTML = '';
+      if (!transactions || !transactions.length) {
+        empty.style.display = '';
+        return;
+      }
+      empty.style.display = 'none';
+
+      // 1) Bar: tokens by feature
+      const fmap = {};
+      transactions.forEach(r => {
+        const feat = _featureLabel(r.feature);
+        if (!fmap[feat]) fmap[feat] = { deducted: 0, count: 0 };
+        if ((r.transaction_type || '').toLowerCase() === 'spend') {
+          const amt = r.transaction_amount !== undefined && r.transaction_amount !== null
+            ? parseInt(r.transaction_amount, 10) : parseInt(r.token_usage, 10);
+          fmap[feat].deducted += isNaN(amt) ? 0 : Math.abs(amt);
+        }
+        fmap[feat].count++;
+      });
+      const featData = Object.keys(fmap).map(k => ({ label: k, value: fmap[k].deducted, color: '#073679' }))
+        .filter(d => d.value > 0).sort((a, b) => b.value - a.value);
+      _svgBarChart(
+        featData.length ? featData : Object.keys(fmap).map(k => ({ label: k, value: fmap[k].count, color: '#4c82b8' })),
+        'Tokens Deducted by Feature', area);
+
+      // 2) Line: daily token deductions
+      const dayMap = {};
+      transactions.forEach(r => {
+        if ((r.transaction_type || '').toLowerCase() !== 'spend') return;
+        const day = (r.timestamp || '').slice(0, 10);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return;
+        const amt = r.transaction_amount !== null && r.transaction_amount !== undefined
+          ? parseInt(r.transaction_amount, 10) : parseInt(r.token_usage, 10);
+        dayMap[day] = (dayMap[day] || 0) + (isNaN(amt) ? 0 : Math.abs(amt));
+      });
+      const dayData = Object.keys(dayMap).sort().map(d => ({ label: d.slice(5), value: dayMap[d] }));
+      _svgLineChart(dayData.length ? dayData : [{ label: '—', value: 0 }], 'Daily Deductions Trend', area, '#073679');
+
+      // 3) Pie: spend vs credit breakdown
+      const spendTotal  = transactions.filter(r => (r.transaction_type || '').toLowerCase() === 'spend').length;
+      const creditTotal = transactions.filter(r => (r.transaction_type || '').toLowerCase() === 'credit').length;
+      const otherTotal  = transactions.length - spendTotal - creditTotal;
+      const pieData = [
+        ...(spendTotal  ? [{ label: 'Spend',  value: spendTotal  }] : []),
+        ...(creditTotal ? [{ label: 'Credit', value: creditTotal }] : []),
+        ...(otherTotal  ? [{ label: 'Other',  value: otherTotal  }] : []),
+      ];
+      _svgPieChart(pieData, 'Transaction Type Breakdown', area);
+    }
+
+    // ── Chart date-range filter ───────────────────────────
+    let _allTxnsForCharts = [];
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+    function _filterTxnsByDate(txns, fromDate, toDate) {
+      return txns.filter(t => {
+        const ts = (t.timestamp || '').slice(0, 10);
+        if (fromDate && ts < fromDate) return false;
+        if (toDate   && ts > toDate)   return false;
+        return true;
+      });
+    }
+    function _setActiveChartBtn(activeBtn) {
+      document.querySelectorAll('.cq-btn').forEach(b => {
+        b.style.background = 'var(--panel)';
+        b.style.color = 'var(--cb)';
+        b.style.border = '1px solid var(--border)';
+      });
+      if (activeBtn) {
+        activeBtn.style.background = '#073679';
+        activeBtn.style.color = '#fff';
+        activeBtn.style.border = '1px solid #073679';
+      }
+    }
+    function applyChartFilter(btn) {
+      const from = document.getElementById('chartFromDate').value;
+      const to   = document.getElementById('chartToDate').value;
+      if (btn !== undefined) _setActiveChartBtn(btn || null);
+      renderFinancialCharts(_filterTxnsByDate(_allTxnsForCharts, from, to), true);
+    }
+    function setChartQuick(days, btn) {
+      const now  = new Date();
+      const from = new Date(now - days * MS_PER_DAY);
+      document.getElementById('chartFromDate').value = from.toISOString().slice(0, 10);
+      document.getElementById('chartToDate').value   = now.toISOString().slice(0, 10);
+      _setActiveChartBtn(btn || null);
+      renderFinancialCharts(_filterTxnsByDate(_allTxnsForCharts, from.toISOString().slice(0,10), now.toISOString().slice(0,10)), true);
+    }
+    function resetChartFilter(btn) {
+      document.getElementById('chartFromDate').value = '';
+      document.getElementById('chartToDate').value   = '';
+      _setActiveChartBtn(btn || document.getElementById('cqBtnAll'));
+      renderFinancialCharts(_allTxnsForCharts, true);
+    }
+
+    loadDashboard();
+
+    // ── Theme toggle ─────────────────────────────────────────
+    (function initTheme() {
+      const saved = localStorage.getItem('fioe_dashboard_theme') || 'light';
+      document.documentElement.dataset.theme = saved;
+      const sel = document.getElementById('themeSelect');
+      if (sel) sel.value = saved;
+    })();
+    document.getElementById('themeSelect')?.addEventListener('change', function() {
+      const theme = this.value;
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem('fioe_dashboard_theme', theme);
+      if (_allTxnsForCharts.length) renderFinancialCharts(_allTxnsForCharts, true);
+    });
+  </script>
+</body>
+</html>

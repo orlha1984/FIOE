@@ -1,0 +1,42 @@
+{
+  "$schema": "https://example.com/schemas/search_target_rules.schema.json",
+  "version": "1.1.0",
+  "description": "Rules for computing dynamic search results target based on selected filters (job, location, companies, sectors, languages, current role, seniority) plus channels & platforms.",
+  "base": {
+    "default": 50,
+    "withJobAndLocation": 60
+  },
+  "weights": {
+    "company": 8,
+    "sector": 6,
+    "language": 5,
+    "currentRole": 4,
+    "channel": 3,
+    "platform": 2
+  },
+  "per_additional": {
+    "company": 2,
+    "sector": 2,
+    "language": 1,
+    "channel": 1,
+    "platform": 1
+  },
+  "bounds": {
+    "min": 10,
+    "max": 100
+  },
+  "seniority_rules": {
+    "Associate": {
+      "weight": 6,
+      "xrayExclusion": "-(Manager OR Director)"
+    },
+    "Manager": {
+      "weight": 4,
+      "xrayExclusion": "-Director"
+    },
+    "Director": {
+      "weight": 0,
+      "xrayExclusion": ""
+    }
+  }
+}

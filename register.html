@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>User Account Registration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root {
+      --bg: #f5f7fa; --panel: #fff; --primary: #0b62c0; --primary-2: #084d94;
+      --border: #d1dde9; --muted: #5c6d7c; --danger: #b00020;
+    }
+    body {
+      min-height: 100vh; background: var(--bg); color: #182230;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      display: flex; align-items: center; justify-content: center; margin: 0;
+    }
+    .register-panel {
+      background: var(--panel); border-radius: 18px; border: 1px solid var(--border);
+      box-shadow: 0 10px 28px -10px rgba(0, 0, 0, .15),0 2px 6px -2px rgba(0,0,0,.08);
+      width: 100%; max-width: 420px; padding: 38px 34px 30px; box-sizing: border-box;
+      display: flex; flex-direction: column; gap: 21px;
+    }
+    h2 { margin: 0 0 12px 0; font-size: 25px; font-weight: 700; color: var(--primary); text-align: center; }
+    .form-group { display: flex; flex-direction: column; margin-bottom: 5px; }
+    label { font-weight: 600; font-size: 13px; letter-spacing: .5px; margin-bottom: 6px; color: #334055; }
+    input[type=text], input[type=password], input[type=email] {
+      padding: 12px 13px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px;
+      background: #fff; transition: border-color .17s, box-shadow .13s; width: 100%;
+    }
+    input[type=text]:focus, input[type=password]:focus, input[type=email]:focus {
+      border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(11,98,192,.11);
+    }
+    /* Hide the User ID visually and from layout, but keep for code usage */
+    .userid-row { display: none !important; }
+    .userid-box { display: none !important; }
+    .form-check {
+      display: flex; align-items: center; gap: 8px; margin: 10px 0 12px 0;
+    }
+    .form-check input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--primary);}
+    button[type=submit] {
+      margin-top: 5px; padding: 13px 0; width: 100%;
+      background: var(--primary); color: #fff; border: none; border-radius: 9px;
+      font-size: 17px; font-weight: 600; letter-spacing: .34px;
+      cursor: pointer; box-shadow: 0 3px 12px -3px rgba(11,98,192,.13);
+      transition: background .19s;
+    }
+    button[type=submit]:hover { background: var(--primary-2);}
+    .msg { text-align: center; font-size: 14px; min-height: 22px; margin-top: 6px;}
+    .msg.error { color: var(--danger);}
+    .msg.success { color: #1f8a45;}
+    .form-extra { margin-top: 18px; text-align: center; color: var(--muted); font-size: 13px;}
+    .form-extra a { color: var(--primary); text-decoration: underline;}
+    @media (max-width:500px) { .register-panel{padding: 14px 5vw 12px 5vw;} }
+  </style>
+</head>
+<body>
+  <form class="register-panel" id="registerForm" autocomplete="off" novalidate>
+    <h2>Create an Account</h2>
+    <div class="form-group">
+      <label for="fullname">Full Name</label>
+      <input required type="text" id="fullname" name="fullname" autocomplete="name" maxlength="64"/>
+    </div>
+    <div class="form-group">
+      <label for="corporation">Corporation</label>
+      <input required type="text" id="corporation" name="corporation" autocomplete="organization" maxlength="64"/>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input required type="email" id="email" name="email" autocomplete="email" maxlength="64" />
+    </div>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input required type="text" id="username" name="username" autocomplete="username" maxlength="32"/>
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input required type="password" id="password" name="password" autocomplete="new-password" maxlength="64"/>
+    </div>
+    <!-- Hidden User ID Row: not visible, but used in code -->
+    <div class="userid-row">
+      <label style="font-weight:600;">User ID:</label>
+      <span class="userid-box" id="autoUserid">(auto)</span>
+    </div>
+    <div class="form-check">
+      <input type="checkbox" id="agreeTOS" required/>
+      <label for="agreeTOS" style="font-weight:400;">I agree to the <a href="/terms.html" target="_blank">Terms of Service and Privacy Policy</a>.</label>
+    </div>
+    <button type="submit">Register Account</button>
+    <div class="msg" id="msgBox"></div>
+    <div class="form-extra">
+      Already have an account? <a href="/login.html">Sign in</a>
+    </div>
+  </form>
+  <script>
+    // Step 1: Helper to generate a random 7-digit user ID
+    function generateUserid() {
+      return Math.floor(Math.random() * 9e6 + 1e6).toString().padStart(7, "0");
+    }
+    // Generate ISO timestamp for created_at
+    function getCurrentTimestamp() {
+      const now = new Date();
+      return now.toISOString();  // e.g. "2025-11-18T04:13:29.768Z"
+    }
+    // Step 2: UI + validation
+    const form = document.getElementById("registerForm");
+    const msg = document.getElementById("msgBox");
+    const autoUseridEl = document.getElementById("autoUserid");
+
+    let pendingUserid = generateUserid();
+    if (autoUseridEl) autoUseridEl.textContent = pendingUserid;
+
+    function showUserid() {
+      pendingUserid = generateUserid();
+      if (autoUseridEl) autoUseridEl.textContent = pendingUserid;
+    }
+
+    form.addEventListener("reset", showUserid);
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      msg.textContent = ""; msg.className = "msg";
+      // Validation
+      const fullname = form.fullname.value.trim();
+      const corp     = form.corporation.value.trim();
+      const email    = form.email.value.trim();
+      const username = form.username.value.trim();
+      const password = form.password.value;
+
+      if (!fullname || !corp || !username || !password || !email) {
+        msg.textContent = "All fields are required.";
+        msg.classList.add("error");
+        return false;
+      }
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        msg.textContent = "Please enter a valid email address.";
+        msg.classList.add("error");
+        return false;
+      }
+      if (!(/[a-zA-Z]/.test(password) && /\d/.test(password))) {
+        msg.textContent = "Password must contain both letters and numbers.";
+        msg.classList.add("error");
+        return false;
+      }
+      if (!form.agreeTOS.checked) {
+        msg.textContent = "You must agree to the Terms of Service and Privacy Policy.";
+        msg.classList.add("error");
+        return false;
+      }
+      // Disable submit during request
+      form.querySelector("button[type=submit]").disabled = true;
+      msg.textContent = "Registering account…";
+
+      try {
+        // Affected section: map 'email' field to 'cemail' for backend DB alignment
+        const payload = {
+          fullname: fullname,
+          corporation: corp,
+          cemail: email,   // Use cemail as key in the payload instead of email
+          username: username,
+          password: password,
+          userid: pendingUserid,
+          created_at: getCurrentTimestamp()
+        };
+        const resp = await fetch("/register", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          msg.textContent = data.error || "Registration failed. Try another username/ID?";
+          msg.classList.add("error");
+          showUserid();
+        } else {
+          msg.textContent = "Registration successful! You can now sign in.";
+          msg.classList.remove("error"); msg.classList.add("success");
+          showUserid();
+          setTimeout(()=>window.location='/login.html', 1100);
+          return;
+        }
+      } catch (err) {
+        msg.textContent = "Network or server error. Try again?";
+        msg.classList.add("error");
+        showUserid();
+      } finally {
+        form.querySelector("button[type=submit]").disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

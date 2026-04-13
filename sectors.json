@@ -1,0 +1,114 @@
+[
+  {
+    "sector": "Healthcare",
+    "domains": [
+      "Pharmaceuticals",
+      "Biotechnology",
+      "Clinical Research",
+      "Medical Devices",
+      "Diagnostics",
+      "HealthTech",
+      "Healthcare Services"
+    ]
+  },
+  {
+    "sector": "Financial Services",
+    "domains": [
+      "Banking",
+      "Insurance",
+      "Investment & Asset Management",
+      "Fintech",
+      "Accounting & Audit",
+      "Legal & Compliance"
+    ]
+  },
+  {
+    "sector": "Technology",
+    "domains": [
+      "Software",
+      "Hardware",
+      "IT Services",
+      "Cloud & Infrastructure",
+      "Cybersecurity",
+      "AI & Data"
+    ]
+  },
+  {
+    "sector": "Media, Gaming & Entertainment",
+    "domains": [
+      "Gaming",
+      "Streaming & OTT",
+      "Publishing",
+      "Advertising & Marketing",
+      "Creator Economy"
+    ]
+  },
+  {
+    "sector": "Industrial & Manufacturing",
+    "domains": [
+      "Automotive",
+      "Aerospace & Defense",
+      "Electronics",
+      "Chemicals",
+      "Machinery",
+      "Construction Materials"
+    ]
+  },
+  {
+    "sector": "Consumer & Retail",
+    "domains": [
+      "E-commerce",
+      "Fashion & Apparel",
+      "Food & Beverage",
+      "Luxury Goods",
+      "Consumer Electronics"
+    ]
+  },
+  {
+    "sector": "Energy & Environment",
+    "domains": [
+      "Oil & Gas",
+      "Renewable Energy",
+      "Utilities",
+      "ESG & Sustainability"
+    ]
+  },
+  {
+    "sector": "Agriculture & Natural Resources",
+    "domains": [
+      "Agribusiness",
+      "Forestry",
+      "Fisheries",
+      "Mining"
+    ]
+  },
+  {
+    "sector": "Transport & Infrastructure",
+    "domains": [
+      "Aviation",
+      "Maritime",
+      "Rail & Transit",
+      "Ride-hailing & Mobility",
+      "Smart Cities"
+    ]
+  },
+  {
+    "sector": "Government, Education & Non-Profit",
+    "domains": [
+      "Public Sector",
+      "Defense & Security",
+      "Education",
+      "NGOs & Charities"
+    ]
+  },
+  {
+    "sector": "Emerging & Cross-Sector",
+    "domains": [
+      "Web3 & Blockchain",
+      "Agentic AI & Automation",
+      "SpaceTech",
+      "Creator & Influencer Platforms",
+      "Gaming Localization"
+    ]
+  }
+]

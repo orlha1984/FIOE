@@ -1,0 +1,146 @@
+{
+  "defaults": {
+    "admin_endpoints": {
+      "requests": 60,
+      "window_seconds": 60
+    },
+    "analytic_batch_size": {
+      "requests": 5,
+      "window_seconds": 60
+    },
+    "analytic_cv_limit": {
+      "requests": 10,
+      "window_seconds": 60
+    },
+    "bulk_assess": {
+      "requests": 100,
+      "window_seconds": 60
+    },
+    "bulk_assess_status": {
+      "requests": 300,
+      "window_seconds": 60
+    },
+    "bulk_delete": {
+      "requests": 100,
+      "window_seconds": 60
+    },
+    "candidates": {
+      "requests": 300,
+      "window_seconds": 60
+    },
+    "dashboard": {
+      "requests": 50,
+      "window_seconds": 60
+    },
+    "gemini": {
+      "requests": 100,
+      "window_seconds": 60
+    },
+    "geography": {
+      "requests": 1000,
+      "window_seconds": 10
+    },
+    "highlight_talent_pools": {
+      "requests": 60,
+      "window_seconds": 60
+    },
+    "login": {
+      "requests": 10,
+      "window_seconds": 60
+    },
+    "preview_target": {
+      "requests": 60,
+      "window_seconds": 60
+    },
+    "register": {
+      "requests": 10,
+      "window_seconds": 60
+    },
+    "start_job": {
+      "requests": 30,
+      "window_seconds": 60
+    },
+    "upload_cv": {
+      "requests": 100,
+      "window_seconds": 60
+    },
+    "upload_multiple_cvs": {
+      "requests": 120,
+      "window_seconds": 60
+    },
+    "vskillset_infer": {
+      "requests": 120,
+      "window_seconds": 60
+    }
+  },
+  "users": {},
+  "system": {
+    "backoff_base_delay_ms": 500,
+    "backoff_max_retries": 3,
+    "dashboard_default_requests": 50,
+    "dashboard_default_window_seconds": 60,
+    "external_api_timeout_ms": 10000,
+    "jd_upload_max_bytes": 6291456,
+    "jd_upload_max_count": 2,
+    "limiter_global_per_hour": 200,
+    "limiter_global_per_minute": 100,
+    "log_retention_months": 6,
+    "make_flask_limit_fallback_req": 10,
+    "make_flask_limit_fallback_win": 60,
+    "no_limit_sentinel": 999999,
+    "pic_max_bytes": 2097152,
+    "porting_upload_max_bytes": 1048576,
+    "rate_limits_cache_ms": 10000,
+    "safe_parse_max_len": 524288,
+    "scheduler_default_duration": 30,
+    "scheduler_default_max_slots": 50,
+    "session_cookie_max_age_ms": 2592000000,
+    "smtp_max_connections": 3,
+    "sse_coalesce_delay_ms": 150,
+    "sse_heartbeat_ms": 30000
+  },
+  "tokens": {
+    "analytic_token_cost": 2,
+    "appeal_approve_credit": 1,
+    "initial_token_display": 5000,
+    "jd_analysis_token_cost": 1,
+    "rebate_credit_per_profile": 1,
+    "sourcing_rate_base": 1,
+    "sourcing_rate_best_mode": 1.5,
+    "sourcing_rate_best_over50": 2.5,
+    "sourcing_rate_over50": 2,
+    "token_cost_sgd": 0.2,
+    "verified_selection_deduct": 5
+  },
+  "access_levels": {
+    "BYOK": {
+      "autosourcing": {
+        "vskillset_infer": {
+          "requests": 120,
+          "window_seconds": 60
+        }
+      },
+      "talent_evaluation": {},
+      "cms": {},
+      "consulting": {},
+      "_syscfg_autosourcing": {},
+      "_syscfg_talent_evaluation": {},
+      "_syscfg_cms": {},
+      "_syscfg_consulting": {}
+    }
+  },
+  "ml": {
+    "confidence_level": {
+      "admin": 0.5,
+      "byok": 0.6,
+      "standard": 0.7,
+      "junior": 0.9
+    },
+    "user_consenses": {
+      "admin": 1,
+      "byok": 2,
+      "standard": 3,
+      "junior": 5
+    }
+  }
+}

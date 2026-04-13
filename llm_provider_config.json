@@ -1,0 +1,19 @@
+{
+  "active_provider": "anthropic",
+  "default_model": "claude-3-5-haiku-20241022",
+  "gemini": {
+    "api_key": "AIzaSyAPfk7Qe9UMGJGfxsSPOt3u9rXW7z_KdWw",
+    "model": "gemini-2.5-flash-lite",
+    "enabled": "disabled"
+  },
+  "openai": {
+    "api_key": "",
+    "model": "gpt-4o-mini",
+    "enabled": "disabled"
+  },
+  "anthropic": {
+    "api_key": "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",
+    "model": "claude-3-5-haiku-20241022",
+    "enabled": "enabled"
+  }
+}

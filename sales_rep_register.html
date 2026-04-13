@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Sales Rep Registration – FIOE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       FIOE colour palette — all six colours used
+       Black Beauty  #222529  →  header background, dark accents
+       Azure Dragon  #073679  →  headings, labels, button
+       Cool Blue     #4c82b8  →  input borders, section bars
+       Robin's Egg   #6deaf9  →  focus glow, highlights, badge
+       Argent        #87888a  →  muted text, dividers
+       Desired Dawn  #d8d8d8  →  page background tint, divider lines
+    ============================================================ */
+    :root {
+      --bb:      #222529;
+      --ad:      #073679;
+      --cb:      #4c82b8;
+      --re:      #6deaf9;
+      --arg:     #87888a;
+      --dd:      #d8d8d8;
+      --bg:      #eef2f7;
+      --panel:   #ffffff;
+      --border:  #d1dde9;
+      --text:    #182230;
+      --danger:  #c0392b;
+      --success: #1a7a45;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Roboto Condensed", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    header {
+      background: var(--bb);
+      border-bottom: 3px solid var(--cb);
+      padding: 0 28px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .header-brand img { height: 34px; width: auto; }
+    .header-title {
+      font-family: "Orbitron", "Roboto Condensed", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: var(--dd);
+    }
+    .header-title .sep { color: var(--re); margin: 0 6px; }
+    .header-back {
+      background: transparent;
+      border: 1px solid var(--cb);
+      color: var(--dd);
+      padding: 5px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: "Roboto Condensed", sans-serif;
+      letter-spacing: 0.4px;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .header-back:hover {
+      background: rgba(109,234,249,0.12);
+      border-color: var(--re);
+      color: var(--re);
+    }
+
+    /* ── Page wrapper ────────────────────────────────────── */
+    .page-wrap {
+      min-height: calc(100vh - 56px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 36px 16px 52px;
+    }
+
+    /* ── Card ────────────────────────────────────────────── */
+    .reg-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--ad);
+      border-radius: 12px;
+      box-shadow: 0 6px 28px -8px rgba(7,54,121,0.16), 0 2px 8px -4px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 700px;
+      padding: 36px 38px 32px;
+    }
+
+    /* ── Card heading ────────────────────────────────────── */
+    .card-header {
+      text-align: center;
+      margin-bottom: 28px;
+      padding-bottom: 22px;
+      border-bottom: 2px solid var(--dd);
+      position: relative;
+    }
+    .card-header .badge {
+      display: inline-block;
+      background: var(--re);
+      color: var(--ad);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      font-family: "Roboto Condensed", sans-serif;
+    }
+    .card-header h1 {
+      margin: 0 0 6px;
+      font-family: "Orbitron", sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      color: var(--ad);
+    }
+    .card-header p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--arg);
+    }
+
+    /* ── Section label ───────────────────────────────────── */
+    .section-label {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      color: var(--cb);
+      margin-top: 8px;
+    }
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--dd);
+    }
+
+    /* ── Form grid ───────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 22px;
+    }
+    .form-grid .full-width { grid-column: 1 / -1; }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: var(--ad);
+    }
+    label .req { color: #c0392b; margin-left: 2px; }
+
+    input[type=text],
+    input[type=password],
+    textarea,
+    select {
+      background: #f8fafd;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: "Roboto Condensed", sans-serif;
+      font-size: 14px;
+      padding: 10px 12px;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.16s, box-shadow 0.14s, background 0.14s;
+    }
+    input[type=text]::placeholder,
+    input[type=password]::placeholder,
+    textarea::placeholder { color: #aab4c0; }
+    input[type=text]:focus,
+    input[type=password]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--cb);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(109,234,249,0.25);
+    }
+    textarea { resize: vertical; min-height: 74px; }
+    select {
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234c82b8'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 30px;
+      background-color: #f8fafd;
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--arg);
+      margin-top: 2px;
+    }
+
+    /* ── Submit ──────────────────────────────────────────── */
+    .submit-wrap { margin-top: 28px; }
+    .btn-register {
+      width: 100%;
+      padding: 13px 0;
+      background: linear-gradient(90deg, var(--ad) 0%, var(--cb) 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-family: "Orbitron", "Roboto Condensed", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px -6px rgba(7,54,121,0.35);
+      transition: filter 0.18s, box-shadow 0.18s;
+    }
+    .btn-register:hover:not(:disabled) {
+      filter: brightness(1.10);
+      box-shadow: 0 4px 20px -6px rgba(76,130,184,0.55);
+    }
+    .btn-register:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* ── Messages ────────────────────────────────────────── */
+    .msg {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 13px;
+      min-height: 20px;
+      font-weight: 600;
+    }
+    .msg.error   { color: var(--danger); }
+    .msg.success { color: var(--success); }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .form-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--arg);
+      padding-top: 16px;
+      border-top: 1px solid var(--dd);
+    }
+    .form-footer a { color: var(--cb); text-decoration: none; font-weight: 700; }
+    .form-footer a:hover { color: var(--ad); text-decoration: underline; }
+
+    /* ── Staff Login Panel ───────────────────────────────── */
+    .login-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--cb);
+      border-radius: 12px;
+      box-shadow: 0 6px 28px -8px rgba(7,54,121,0.16), 0 2px 8px -4px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 700px;
+      padding: 28px 38px 24px;
+      margin-bottom: 20px;
+    }
+    .login-card h2 {
+      margin: 0 0 6px;
+      font-family: "Orbitron", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: var(--ad);
+    }
+    .login-card p {
+      margin: 0 0 18px;
+      font-size: 13px;
+      color: var(--arg);
+    }
+    .register-prompt {
+      margin: 14px 0 0;
+      font-size: 13px;
+      color: var(--cb);
+      font-weight: 600;
+    }
+    .login-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .login-row .form-group { flex: 1; min-width: 160px; }
+    .btn-login {
+      padding: 10px 24px;
+      background: linear-gradient(90deg, var(--ad) 0%, var(--cb) 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-family: "Orbitron", "Roboto Condensed", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: filter 0.18s;
+      height: 42px;
+    }
+    .btn-login:hover:not(:disabled) { filter: brightness(1.12); }
+    .btn-login:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* ── Collapsible registration panel ─────────────────── */
+    .reg-toggle-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 700px;
+      overflow: visible;
+    }
+    .reg-toggle-header {
+      padding: 12px 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 13px;
+      color: #334155;
+      background: #f1f5f9;
+      border-radius: 10px;
+      user-select: none;
+      transition: background 0.15s, border-radius 0.01s;
+    }
+    .reg-toggle-header.has-content {
+      border-radius: 10px 10px 0 0;
+    }
+    .reg-toggle-header:hover { background: #e2e8f0; }
+    .reg-toggle-content {
+      display: none;
+      padding: 0;
+      border-top: 1px solid var(--border);
+    }
+    .reg-toggle-content.open { display: block; }
+    .reg-toggle-inner { padding: 28px 38px 24px; }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 560px) {
+      .reg-card { padding: 24px 16px 20px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .full-width { grid-column: 1; }
+      .section-label { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-brand">
+      <img src="/fioe-logo.svg" alt="FIOE logo"/>
+      <span class="header-title">FIOE<span class="sep">›</span>Sales Rep Registration</span>
+    </div>
+    <a href="/login.html" class="header-back">←Back to Home</a>
+  </header>
+
+  <div class="page-wrap" style="flex-direction:column; align-items:center;">
+
+    <!-- ── Staff Login Panel ── -->
+    <div class="login-card" id="staffLoginCard">
+      <h2>STAFF LOGIN</h2>
+      <p>Sign in with your employee credentials to access the Sales Rep Dashboard.</p>
+      <div class="login-row">
+        <div class="form-group">
+          <label for="empUsername">Username <span class="req">*</span></label>
+          <input type="text" id="empUsername" placeholder="Employee username" autocomplete="username" maxlength="50"/>
+        </div>
+        <div class="form-group">
+          <label for="empPassword">Password <span class="req">*</span></label>
+          <input type="password" id="empPassword" placeholder="Password" autocomplete="current-password" maxlength="128"/>
+        </div>
+        <button type="button" class="btn-login" id="loginBtn">SIGN IN</button>
+      </div>
+      <div class="msg" id="loginMsg"></div>
+      <p class="register-prompt">Want to be a FIOE Sales Rep? Register below.</p>
+    </div>
+
+    <!-- ── Collapsible Registration Panel (freely toggleable) ── -->
+    <div class="reg-toggle-panel" id="regTogglePanel">
+      <div class="reg-toggle-header" id="regToggleHeader"
+           role="button" tabindex="0" aria-expanded="false"
+           onclick="toggleRegPanel()"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleRegPanel();}">
+        <span>📋 Sales Rep Registration Form</span>
+        <span id="regToggleArrow">▼</span>
+      </div>
+      <div class="reg-toggle-content" id="regToggleContent">
+        <div class="reg-toggle-inner">
+
+          <div class="card-header">
+            <div class="badge">Sales Representative</div>
+            <h1>SALES REP REGISTRATION</h1>
+            <p>Create your sales representative profile on the FIOE platform</p>
+          </div>
+
+          <form id="salesRepForm" autocomplete="off" novalidate>
+            <div class="form-grid">
+
+          <!-- Account Credentials -->
+          <div class="section-label">Account Credentials</div>
+
+          <div class="form-group">
+            <label for="full_name">Full Name <span class="req">*</span></label>
+            <input type="text" id="full_name" name="full_name" placeholder="e.g. Jane Smith" maxlength="100" autocomplete="name"/>
+          </div>
+
+          <div class="form-group">
+            <label for="username">Username <span class="req">*</span></label>
+            <input type="text" id="username" name="username" placeholder="e.g. jsmith" maxlength="50" autocomplete="username"/>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="password">Password <span class="req">*</span></label>
+            <input type="password" id="password" name="password" placeholder="Minimum 8 characters with letters and numbers" maxlength="128" autocomplete="new-password"/>
+            <span class="field-hint">Must contain both letters and numbers (minimum 8 characters).</span>
+          </div>
+
+          <!-- Personal Details -->
+          <div class="section-label">Personal Details</div>
+
+          <div class="form-group">
+            <label for="nationality">Nationality <span class="req">*</span></label>
+            <input type="text" id="nationality" name="nationality" placeholder="e.g. Singaporean" maxlength="80"/>
+          </div>
+
+          <div class="form-group">
+            <label for="location">Location <span class="req">*</span></label>
+            <input type="text" id="location" name="location" placeholder="e.g. Singapore" maxlength="100"/>
+          </div>
+
+          <!-- Professional Profile -->
+          <div class="section-label">Professional Profile</div>
+
+          <div class="form-group full-width">
+            <label for="skillsets">Skillsets <span class="req">*</span></label>
+            <textarea id="skillsets" name="skillsets" placeholder="e.g. B2B Sales, Account Management, CRM, Negotiation" maxlength="1000"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="industrial_vertical">Industrial Vertical <span class="req">*</span></label>
+            <input type="text" id="industrial_vertical" name="industrial_vertical" placeholder="e.g. Technology, Finance" maxlength="200"/>
+          </div>
+
+          <div class="form-group">
+            <label for="language_skills">Language Skills <span class="req">*</span></label>
+            <input type="text" id="language_skills" name="language_skills" placeholder="e.g. English, Mandarin, Malay" maxlength="200"/>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="travel_availability">Travel Availability <span class="req">*</span></label>
+            <select id="travel_availability" name="travel_availability">
+              <option value="" disabled selected>— Select travel availability —</option>
+              <option value="Yes – Frequent">Yes – Frequent (weekly / international)</option>
+              <option value="Yes – Occasional">Yes – Occasional (monthly / regional)</option>
+              <option value="Yes – Domestic only">Yes – Domestic only</option>
+              <option value="No">No – Not available for travel</option>
+            </select>
+          </div>
+
+          </div><!-- /.form-grid -->
+
+            <div class="submit-wrap">
+              <button type="submit" class="btn-register" id="submitBtn">REGISTER AS SALES REP</button>
+              <div class="msg" id="msgBox"></div>
+            </div>
+          </form>
+
+
+
+        </div><!-- /.reg-toggle-inner -->
+      </div><!-- /.reg-toggle-content -->
+    </div><!-- /.reg-toggle-panel -->
+
+  </div><!-- /.page-wrap -->
+
+  <script>
+    /* ── Redirect already-signed-in users to dashboard ── */
+    (function () {
+      function getCookie(name) {
+        const match = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
+        return match ? decodeURIComponent(match[1]) : null;
+      }
+      if (getCookie('emp_username')) {
+        window.location.replace('/sales_rep_dashboard.html');
+      }
+    })();
+
+    /* ── Staff Login ── */
+    const loginBtn  = document.getElementById('loginBtn');
+    const loginMsg  = document.getElementById('loginMsg');
+    const empUser   = document.getElementById('empUsername');
+    const empPass   = document.getElementById('empPassword');
+
+    function setLoginMsg(text, type) {
+      loginMsg.textContent = text;
+      loginMsg.className = 'msg' + (type ? ' ' + type : '');
+    }
+
+    loginBtn.addEventListener('click', async function () {
+      setLoginMsg('', '');
+      const username = empUser.value.trim();
+      const password = empPass.value;
+      if (!username || !password) {
+        setLoginMsg('Please enter both username and password.', 'error');
+        return;
+      }
+      loginBtn.disabled = true;
+      setLoginMsg('Verifying…', '');
+      try {
+        const resp = await fetch('/employee/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ username, password })
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          setLoginMsg(data.error || 'Invalid credentials. Please try again.', 'error');
+        } else {
+          setLoginMsg('Login successful! Redirecting to dashboard…', 'success');
+          setTimeout(() => { window.location.href = '/sales_rep_dashboard.html'; }, 800);
+        }
+      } catch (err) {
+        setLoginMsg('Network or server error. Please try again.', 'error');
+      } finally {
+        loginBtn.disabled = false;
+      }
+    });
+
+    /* Allow pressing Enter in the password field to submit */
+    empPass.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    /* ── Registration Toggle ── */
+    function toggleRegPanel() {
+      const content = document.getElementById('regToggleContent');
+      const arrow   = document.getElementById('regToggleArrow');
+      const header  = document.getElementById('regToggleHeader');
+      content.classList.toggle('open');
+      const isOpen = content.classList.contains('open');
+      arrow.textContent = isOpen ? '▲' : '▼';
+      header.setAttribute('aria-expanded', String(isOpen));
+      header.classList.toggle('has-content', isOpen);
+    }
+
+    /* ── Registration Submit ── */
+    const form = document.getElementById('salesRepForm');
+    const msg  = document.getElementById('msgBox');
+    const btn  = document.getElementById('submitBtn');
+
+    function setMsg(text, type) {
+      msg.textContent = text;
+      msg.className = 'msg' + (type ? ' ' + type : '');
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      setMsg('', '');
+
+      const full_name            = form.full_name.value.trim();
+      const username             = form.username.value.trim();
+      const password             = form.password.value;
+      const nationality          = form.nationality.value.trim();
+      const location             = form.location.value.trim();
+      const skillsets            = form.skillsets.value.trim();
+      const industrial_vertical  = form.industrial_vertical.value.trim();
+      const language_skills      = form.language_skills.value.trim();
+      const travel_availability  = form.travel_availability.value;
+
+      if (!full_name || !username || !password || !nationality || !location ||
+          !skillsets || !industrial_vertical || !language_skills || !travel_availability) {
+        setMsg('All fields are required.', 'error');
+        return;
+      }
+      if (password.length < 8) {
+        setMsg('Password must be at least 8 characters.', 'error');
+        return;
+      }
+      if (!(/[a-zA-Z]/.test(password) && /\d/.test(password))) {
+        setMsg('Password must contain both letters and numbers.', 'error');
+        return;
+      }
+      if (!/^[a-zA-Z0-9_\-\.]+$/.test(username)) {
+        setMsg('Username may only contain letters, numbers, underscores, hyphens and dots.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      setMsg('Registering…', '');
+
+      try {
+        const resp = await fetch('/employee/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            full_name, username, password, nationality, location,
+            skillsets, industrial_vertical, language_skills, travel_availability
+          })
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          setMsg(data.error || 'Registration failed. Please try again.', 'error');
+        } else {
+          setMsg('Registration successful! Redirecting to your dashboard…', 'success');
+          form.reset();
+          setTimeout(() => { window.location.href = '/sales_rep_dashboard.html'; }, 1400);
+        }
+      } catch (err) {
+        setMsg('Network or server error. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
