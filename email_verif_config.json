@@ -1,0 +1,14 @@
+{
+  "neverbounce": {
+    "api_key": "",
+    "enabled": "enabled"
+  },
+  "zerobounce": {
+    "api_key": "",
+    "enabled": "enabled"
+  },
+  "bouncer": {
+    "api_key": "",
+    "enabled": "enabled"
+  }
+}
